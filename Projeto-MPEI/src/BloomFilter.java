@@ -9,15 +9,27 @@ public class BloomFilter {
     }
     void addElement(String elem){
         for(var i = 0; i < k; i++){
-            filter[(elem + i).hashCode() % n] = true;
+            filter[Math.abs((elem + i).hashCode() % n)] = true;
         }
     }
     boolean isElement(String elem){
         for(var i = 0; i < k; i++){
-            if(!filter[(elem + i).hashCode() % n]){
+            if(!filter[Math.abs((elem + i).hashCode() % n)]){
                 return false;
             }
         }
         return true;
+    }
+
+    public int getN() {
+        return n;
+    }
+
+    public int getK() {
+        return k;
+    }
+
+    public boolean[] getFilter() {
+        return filter;
     }
 }
