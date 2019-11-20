@@ -1,3 +1,5 @@
+package modules;
+
 import java.io.File;
 import java.util.HashSet;
 import java.util.Scanner;
@@ -44,7 +46,7 @@ public class BloomFilter {
         return Math.pow(1 - Math.pow(1 - (double) 1 / n, k * numElem), k);
     }
 
-    void addElement(String elem) {
+    public void addElement(String elem) {
         var cond = true;
         for (var i = 0; i < k; i++) {
             if (cond) filter[Math.abs((elem + i).hashCode() % n)] = true;
@@ -53,7 +55,7 @@ public class BloomFilter {
         }
     }
 
-    boolean isElement(String elem) {
+    public boolean isElement(String elem) {
         var cond = true;
         for (var i = 0; i < k; i++) {
             if (cond && !filter[Math.abs((elem + i).hashCode() % n)]) {

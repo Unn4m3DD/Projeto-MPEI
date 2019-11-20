@@ -1,3 +1,7 @@
+package Tests;
+
+import modules.BloomFilter;
+
 import java.io.File;
 import java.util.*;
 

@@ -1,9 +1,8 @@
+package util;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.Scanner;
 
 
@@ -30,7 +29,7 @@ public class BookCrawler {
         lastThread.join();
         long finish = System.currentTimeMillis();
         long timeElapsed = finish - start;
-        System.out.println("Book Download || Book Verification " + timeElapsed + "ms");
+        System.out.println("util.Book Download || util.Book Verification " + timeElapsed + "ms");
     }
 
     private static void separateBooks() {
@@ -59,7 +58,7 @@ public class BookCrawler {
         }
         long finish = System.currentTimeMillis();
         long timeElapsed = finish - start;
-        System.out.println("Book Separation " + timeElapsed + "ms");
+        System.out.println("util.Book Separation " + timeElapsed + "ms");
 
     }
 
@@ -74,7 +73,7 @@ public class BookCrawler {
         }
         long finish = System.currentTimeMillis();
         long timeElapsed = finish - start;
-        System.out.println("Book Filtering " + timeElapsed + "ms");
+        System.out.println("util.Book Filtering " + timeElapsed + "ms");
     }
 
     private static void deleteDir(File d) {
