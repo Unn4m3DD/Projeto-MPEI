@@ -4,18 +4,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class TimeThis {
-    long start;
-    String s;
-    String opc;
-    public static boolean currentlyTiming, verbose, vverbose = false;
-    static HashMap<String, ArrayList<Integer>> allTimes = new HashMap<>();
+    private long start;
+    private String s;
+    private String opc;
+    public static boolean currentlyTiming;
+    private static boolean verbose;
+    private static HashMap<String, ArrayList<Integer>> allTimes = new HashMap<>();
 
     public TimeThis(String s, String opc) {
         start = System.currentTimeMillis();
         this.s = s;
         this.opc = opc;
         if (!allTimes.containsKey(s))
-            allTimes.put(s, new ArrayList<Integer>());
+            allTimes.put(s, new ArrayList<>());
     }
 
     public TimeThis() {
@@ -29,7 +30,7 @@ public class TimeThis {
     public void end() {
         if (currentlyTiming) {
             allTimes.get(s).add((int) (System.currentTimeMillis() - start));
-            if ((verbose && opc.equals("v")) || (vverbose && opc.equals("vv")) || opc.equals("e"))
+            if ((verbose && opc.equals("v")) || opc.equals("e"))
                 System.out.printf("%10.10s ms    %s\n", System.currentTimeMillis() - start, s);
         }
     }

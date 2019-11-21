@@ -1,6 +1,5 @@
 package modules;
 
-import util.Book;
 import util.TimeThis;
 
 import java.io.*;
@@ -9,7 +8,7 @@ import java.util.*;
 import static util.Enviroment.*;
 
 public class MinHash implements Serializable {
-    int[] signature;
+    private int[] signature;
 
     public MinHash(List<Integer> set) {
         TimeThis t;

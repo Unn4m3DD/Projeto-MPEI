@@ -14,7 +14,7 @@ public class Book {
         TimeThis t = new TimeThis("File to util.Book ");
         name = f.getName();
         boolean titleFetched = false;
-        try (Scanner s = new Scanner(f);) {
+        try (Scanner s = new Scanner(f)) {
             while (s.hasNextLine()) {
                 String c_line = s.nextLine();
                 if (!titleFetched && c_line.split(":")[0].equals("Title"))

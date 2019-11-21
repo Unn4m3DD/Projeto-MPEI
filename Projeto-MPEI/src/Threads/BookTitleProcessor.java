@@ -1,21 +1,20 @@
 package Threads;
 
 import modules.MinHash;
-import modules.MinHashSeed;
 import util.Book;
 import util.Mutable;
 import util.ProcessedBooksResult;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static util.Enviroment.*;
 
 public class BookTitleProcessor extends Thread {
-    ConcurrentLinkedQueue<Book> toProcessTitle, toProcessContent;
-    HashMap<String, ProcessedBooksResult> result;
-    Mutable<Boolean> finished;
+    private ConcurrentLinkedQueue<Book> toProcessTitle;
+    private ConcurrentLinkedQueue<Book> toProcessContent;
+    private HashMap<String, ProcessedBooksResult> result;
+    private Mutable<Boolean> finished;
 
     public BookTitleProcessor(
             ConcurrentLinkedQueue<Book> toProcessTitle,

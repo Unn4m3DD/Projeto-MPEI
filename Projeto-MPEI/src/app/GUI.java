@@ -7,8 +7,8 @@ import java.awt.*;
 
 import static app.Interface.parseDirectory;
 
-public class GUI {
-    public static Mutable<Double> progress = new Mutable<>(0.0);
+class GUI {
+    private static Mutable<Double> progress = new Mutable<>(0.0);
 
 
     public static void main(String[] args) {

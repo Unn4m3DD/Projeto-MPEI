@@ -1,8 +1,6 @@
 package Tests;
 
-import java.io.*;
-
-public class MinHashTest {
+class MinHashTest {
 
     public static void main(String[] args){
 

@@ -3,26 +3,21 @@ package util;
 import Threads.BookContentProcessor;
 import Threads.BookTitleProcessor;
 import Threads.FileToBookProcessor;
-import modules.MinHash;
-import modules.MinHashSeed;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import static util.Enviroment.numberOfHashesForMinHash;
 
 
 public class BookDirectoryProcessor extends Thread {
-    ConcurrentLinkedQueue<Book>
-            toProcessTitle = new ConcurrentLinkedQueue<>(),
-            toProcessContent = new ConcurrentLinkedQueue<>();
-    Mutable<Boolean> finished = new Mutable<Boolean>(false);
+    private ConcurrentLinkedQueue<Book>
+            toProcessTitle = new ConcurrentLinkedQueue<>();
+    private ConcurrentLinkedQueue<Book> toProcessContent = new ConcurrentLinkedQueue<>();
+    private Mutable<Boolean> finished = new Mutable<>(false);
     public HashMap<String, ProcessedBooksResult> result = new HashMap<>();
-    File dir;
-    Mutable<Double> progress;
+    private File dir;
+    private Mutable<Double> progress;
 
     public BookDirectoryProcessor(File dir, Mutable<Double> progress) {
         this.dir = dir;
@@ -40,7 +35,7 @@ public class BookDirectoryProcessor extends Thread {
         threads[4] = new BookContentProcessor(toProcessContent, finished, result);
         threads[5] = new BookContentProcessor(toProcessContent, finished, result);
 //        threads[6] = new BookContentProcessor(toProcessContent, finished, result, minHashSeed);
-        for (var i = 0; i < threads.length; i++) threads[i].start();
+        for (Thread thread : threads) thread.start();
 
         while (threads[3].isAlive()) {
             try {
@@ -70,7 +65,7 @@ public class BookDirectoryProcessor extends Thread {
 //        File d = new File("books\\English");
         File d = new File("books\\Spanish");
 
-        BookDirectoryProcessor bookDirectoryProcessor = new BookDirectoryProcessor(d, new Mutable<Double>(1.0));
+        BookDirectoryProcessor bookDirectoryProcessor = new BookDirectoryProcessor(d, new Mutable<>(1.0));
         compareAll(bookDirectoryProcessor.result);
     }
 
@@ -86,10 +81,7 @@ public class BookDirectoryProcessor extends Thread {
                 var m1 = result.get(key1).minHashedContent;
                 var m2 = result.get(key2).minHashedContent;
                 double sim = m1.calcSimTo(m2);
-                try {
-                    System.out.println(String.format("%10.10s e %10.10s têm similaridade %5.5s", key1, key2, sim));
-                } catch (Exception e) {
-                }
+                System.out.println(String.format("%10.10s e %10.10s têm similaridade %5.5s", key1, key2, sim));
             }
         }
         t.end();

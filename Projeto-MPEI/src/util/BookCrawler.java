@@ -6,7 +6,7 @@ import java.net.URL;
 import java.util.Scanner;
 
 
-public class BookCrawler {
+class BookCrawler {
 
     public static void main(String[] args) throws InterruptedException {
 //        downloadBooks();
@@ -89,8 +89,8 @@ public class BookCrawler {
 
 
 class UrlToTxt extends Thread {
-    String targetURL;
-    int idx;
+    private String targetURL;
+    private int idx;
 
     UrlToTxt(int idx) {
         targetURL = "http://www.gutenberg.org/cache/epub/" + idx + "/pg" + idx + ".txt";
@@ -103,7 +103,6 @@ class UrlToTxt extends Thread {
             File f = new File("books/" + idx + ".txt");
             if (f.exists()) {
                 return;
-            } else {
             }
             //Create connection
             URL url = new URL(targetURL);
@@ -115,7 +114,7 @@ class UrlToTxt extends Thread {
             connection.setReadTimeout(connection.getReadTimeout() * 10);
             //Send request
             new DataOutputStream(connection.getOutputStream());
-            ;
+
 
             //Get Response
             InputStream is = connection.getInputStream();
@@ -129,7 +128,8 @@ class UrlToTxt extends Thread {
             }
             fw.close();
             rd.close();
-        } catch (Exception e) {
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
         } finally {
             if (connection != null) {
                 connection.disconnect();

@@ -20,14 +20,14 @@ public class BloomFilter {
         return optimalK((long) n, (long) m);
     }
 
-    public static int optimalK(long n, long m) {
+    private static int optimalK(long n, long m) {
         int optK = (int) Math.round(n * 0.693 / m);
         return optK == 0 ? 1 : optK;
     }
 
     public static BloomFilter fromFile(String fName) {
         File book = new File(fName);
-        Set<String> wordSet = new HashSet<String>();
+        Set<String> wordSet = new HashSet<>();
         try (Scanner k = new Scanner(book)) {
             while (k.hasNext()) {
                 wordSet.add(k.next());

@@ -8,10 +8,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 
 public class FileToBookProcessor extends Thread {
-    ConcurrentLinkedQueue<Book> toProcessTitle, toProcessContent;
-    File dir;
-    Mutable<Boolean> finished;
-    Mutable<Double> progress;
+    private ConcurrentLinkedQueue<Book> toProcessTitle;
+    private ConcurrentLinkedQueue<Book> toProcessContent;
+    private File dir;
+    private Mutable<Boolean> finished;
+    private Mutable<Double> progress;
 
     public FileToBookProcessor(
             ConcurrentLinkedQueue<Book> toProcessTitle,
