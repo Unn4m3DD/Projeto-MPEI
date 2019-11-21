@@ -19,13 +19,12 @@ public class BookDirectoryProcessor {
     ConcurrentLinkedQueue<Book>
             toProcessTitle = new ConcurrentLinkedQueue<>(),
             toProcessContent = new ConcurrentLinkedQueue<>();
-    MutableBoolean finished = new MutableBoolean(false), t0ShouldSleep = new MutableBoolean(false),
-            t4ShouldSleep = new MutableBoolean(true);
-    HashMap<String, ProcessedBooksResult> result = new HashMap<String, ProcessedBooksResult>();
-    BookDirectoryProcessor(File dir) {
+    Mutable<Boolean> finished = new Mutable<Boolean>(false);
+    public HashMap<String, ProcessedBooksResult> result = new HashMap<>();
+    public BookDirectoryProcessor(File dir, Mutable<Double> progress) {
         MinHashSeed mhs = new MinHashSeed(numberOfHashesForMinHash);
         Thread[] threads = new Thread[6];
-        threads[0] = new FileToBookProcessor(toProcessTitle, toProcessContent, dir, finished);
+        threads[0] = new FileToBookProcessor(toProcessTitle, toProcessContent, dir, finished, progress);
         threads[1] = new BookTitleProcessor(toProcessTitle, toProcessContent, finished, result, mhs);
         threads[2] = new BookContentProcessor(toProcessContent, finished, result, mhs);
         threads[3] = new BookContentProcessor(toProcessContent, finished, result, mhs);
@@ -36,8 +35,10 @@ public class BookDirectoryProcessor {
 
         while (threads[3].isAlive()) {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(5000);
+                TimeThis t = new TimeThis("Garbage collector delay", "v");
                 System.gc();
+                t.end();
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
             }
@@ -59,13 +60,15 @@ public class BookDirectoryProcessor {
         TimeThis.currentlyTiming = true;
 
         TimeThis t = new TimeThis("Processamento para MinHash e BloomFilter", "e");
-        BookDirectoryProcessor bookDirectoryProcessor = new BookDirectoryProcessor(d);
+        BookDirectoryProcessor bookDirectoryProcessor = new BookDirectoryProcessor(d, new Mutable<Double>(1.0));
         t.end();
-//        compareAll(bookDirectoryProcessor.result);
+        compareAll(bookDirectoryProcessor.result);
+        TimeThis.printAllDelays();
     }
 
     private static void compareAll(HashMap<String, ProcessedBooksResult> result) {
         ArrayList<String> testedKeys = new ArrayList<>(result.size());
+        TimeThis t = new TimeThis("Comparação de " + result.size() + "items", "v");
         for (var key1 : result.keySet()) {
             testedKeys.add(key1);
             for (var key2 : result.keySet()) {
@@ -81,5 +84,6 @@ public class BookDirectoryProcessor {
                 }
             }
         }
+        t.end();
     }
 }

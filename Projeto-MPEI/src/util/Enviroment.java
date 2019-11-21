@@ -8,4 +8,5 @@ public abstract class Enviroment {
     public static int titleShingleSize = 4;
     public static int contentShingleSize = 8;
     public static int numberOfHashesForMinHash = 150;
+    public static boolean countingProgress = false;
 }

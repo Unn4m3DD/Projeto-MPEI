@@ -26,7 +26,7 @@ public class MinHashTest {
         t.end();
         listFiles = d.listFiles();
         HashMap<String, MinHash> mhList = new HashMap<>();
-        mhList = create();
+       // mhList = create();
         save(mhList, mhs);
 //        var saved = load();
 //        mhList = saved.mh;
@@ -55,12 +55,6 @@ public class MinHashTest {
 
     }
 
-    private static HashMap<String, MinHash> create() {
-        HashMap<String, MinHash> mhList;
-        mhs = new MinHashSeed(150);
-        mhList = MinHash.fromFileList(listFiles, mhs, 8);
-        return mhList;
-    }
 
     private static ToSave load() throws IOException {
         ToSave result = new ToSave();

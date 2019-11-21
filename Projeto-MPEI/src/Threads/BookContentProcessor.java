@@ -13,12 +13,12 @@ import static util.Enviroment.contentShingleSize;
 public class BookContentProcessor extends Thread {
     ConcurrentLinkedQueue<Book> toProcessContent;
     HashMap<String, ProcessedBooksResult> result;
-    MutableBoolean finished;
+    Mutable<Boolean> finished;
     MinHashSeed minHashSeed;
 
     public BookContentProcessor(
             ConcurrentLinkedQueue<Book> toProcessContent,
-            MutableBoolean finished, HashMap<String, ProcessedBooksResult> result,
+            Mutable<Boolean> finished, HashMap<String, ProcessedBooksResult> result,
             MinHashSeed minHashSeed
     ) {
         this.toProcessContent = toProcessContent;
@@ -31,19 +31,15 @@ public class BookContentProcessor extends Thread {
         do {
             Book b = toProcessContent.poll();
             while (b != null) {
-                TimeThis t = new TimeThis("1 contentMinHash", "v");
+                TimeThis t = new TimeThis("1 Content MinHash", "v");
                 MinHash minHashedContent = new MinHash(MinHash.shinglesFromCharArr(b.getContent(), contentShingleSize), minHashSeed);
-                if (!result.containsKey(b.getName())) {
-                    ProcessedBooksResult innerResult = new ProcessedBooksResult();
-                    innerResult.minHashedContent = minHashedContent;
-                    result.put(b.getName(), innerResult);
-                } else {
-                    result.get(b.getName()).minHashedContent = minHashedContent;
-                }
+
+                result.get(b.getName()).minHashedContent = minHashedContent;
+
                 b = toProcessContent.poll();
                 t.end();
             }
-        }while (!finished.getB());
+        } while (!finished.get());
 
     }
 }

@@ -3,7 +3,7 @@ package Threads;
 import modules.MinHash;
 import modules.MinHashSeed;
 import util.Book;
-import util.MutableBoolean;
+import util.Mutable;
 import util.ProcessedBooksResult;
 
 import java.io.File;
@@ -15,13 +15,13 @@ import static util.Enviroment.titleShingleSize;
 public class BookTitleProcessor extends Thread {
     ConcurrentLinkedQueue<Book> toProcessTitle, toProcessContent;
     HashMap<String, ProcessedBooksResult> result;
-    MutableBoolean finished;
+    Mutable<Boolean> finished;
     MinHashSeed minHashSeed;
 
     public BookTitleProcessor(
             ConcurrentLinkedQueue<Book> toProcessTitle,
             ConcurrentLinkedQueue<Book> toProcessContent,
-            MutableBoolean finished,
+            Mutable<Boolean> finished,
             HashMap<String, ProcessedBooksResult> result,
             MinHashSeed minHashSeed
     ) {
@@ -56,7 +56,7 @@ public class BookTitleProcessor extends Thread {
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
             }
-        } while (!finished.getB());
+        } while (!finished.get());
 
     }
 }
