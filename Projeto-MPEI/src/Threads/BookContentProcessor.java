@@ -1,30 +1,25 @@
 package Threads;
 
 import modules.MinHash;
-import modules.MinHashSeed;
 import util.*;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import static util.Enviroment.contentShingleSize;
+import static util.Enviroment.*;
 
 public class BookContentProcessor extends Thread {
-    ConcurrentLinkedQueue<Book> toProcessContent;
-    HashMap<String, ProcessedBooksResult> result;
-    Mutable<Boolean> finished;
-    MinHashSeed minHashSeed;
+    private ConcurrentLinkedQueue<Book> toProcessContent;
+    private HashMap<String, ProcessedBooksResult> result;
+    private Mutable<Boolean> finished;
 
     public BookContentProcessor(
             ConcurrentLinkedQueue<Book> toProcessContent,
-            Mutable<Boolean> finished, HashMap<String, ProcessedBooksResult> result,
-            MinHashSeed minHashSeed
+            Mutable<Boolean> finished, HashMap<String, ProcessedBooksResult> result
     ) {
         this.toProcessContent = toProcessContent;
         this.finished = finished;
         this.result = result;
-        this.minHashSeed = minHashSeed;
     }
 
     public void run() {
@@ -32,10 +27,7 @@ public class BookContentProcessor extends Thread {
             Book b = toProcessContent.poll();
             while (b != null) {
                 TimeThis t = new TimeThis("1 Content MinHash", "v");
-                MinHash minHashedContent = new MinHash(MinHash.shinglesFromCharArr(b.getContent(), contentShingleSize), minHashSeed);
-
-                result.get(b.getName()).minHashedContent = minHashedContent;
-
+                result.get(b.getName()).minHashedContent = new MinHash(MinHash.shinglesFromCharArr(b.getContent(), contentShingleSize));
                 b = toProcessContent.poll();
                 t.end();
             }

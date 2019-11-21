@@ -15,22 +15,31 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import static util.Enviroment.numberOfHashesForMinHash;
 
 
-public class BookDirectoryProcessor {
+public class BookDirectoryProcessor extends Thread {
     ConcurrentLinkedQueue<Book>
             toProcessTitle = new ConcurrentLinkedQueue<>(),
             toProcessContent = new ConcurrentLinkedQueue<>();
     Mutable<Boolean> finished = new Mutable<Boolean>(false);
     public HashMap<String, ProcessedBooksResult> result = new HashMap<>();
+    File dir;
+    Mutable<Double> progress;
+
     public BookDirectoryProcessor(File dir, Mutable<Double> progress) {
-        MinHashSeed mhs = new MinHashSeed(numberOfHashesForMinHash);
+        this.dir = dir;
+        this.progress = progress;
+    }
+
+    public void run() {
+        TimeThis.currentlyTiming = true;
+        TimeThis t1 = new TimeThis("Processamento para MinHash e BloomFilter", "e");
         Thread[] threads = new Thread[6];
         threads[0] = new FileToBookProcessor(toProcessTitle, toProcessContent, dir, finished, progress);
-        threads[1] = new BookTitleProcessor(toProcessTitle, toProcessContent, finished, result, mhs);
-        threads[2] = new BookContentProcessor(toProcessContent, finished, result, mhs);
-        threads[3] = new BookContentProcessor(toProcessContent, finished, result, mhs);
-        threads[4] = new BookContentProcessor(toProcessContent, finished, result, mhs);
-        threads[5] = new BookContentProcessor(toProcessContent, finished, result, mhs);
-//        threads[6] = new BookContentProcessor(toProcessContent, finished, result, mhs);
+        threads[1] = new BookTitleProcessor(toProcessTitle, toProcessContent, finished, result);
+        threads[2] = new BookContentProcessor(toProcessContent, finished, result);
+        threads[3] = new BookContentProcessor(toProcessContent, finished, result);
+        threads[4] = new BookContentProcessor(toProcessContent, finished, result);
+        threads[5] = new BookContentProcessor(toProcessContent, finished, result);
+//        threads[6] = new BookContentProcessor(toProcessContent, finished, result, minHashSeed);
         for (var i = 0; i < threads.length; i++) threads[i].start();
 
         while (threads[3].isAlive()) {
@@ -51,19 +60,18 @@ public class BookDirectoryProcessor {
                 ie.printStackTrace();
             }
         }
+        t1.end();
+        TimeThis.printAllDelays();
+
     }
 
     public static void main(String[] args) {
 //        File d = new File("books\\TestBase");
 //        File d = new File("books\\English");
         File d = new File("books\\Spanish");
-        TimeThis.currentlyTiming = true;
 
-        TimeThis t = new TimeThis("Processamento para MinHash e BloomFilter", "e");
         BookDirectoryProcessor bookDirectoryProcessor = new BookDirectoryProcessor(d, new Mutable<Double>(1.0));
-        t.end();
         compareAll(bookDirectoryProcessor.result);
-        TimeThis.printAllDelays();
     }
 
     private static void compareAll(HashMap<String, ProcessedBooksResult> result) {

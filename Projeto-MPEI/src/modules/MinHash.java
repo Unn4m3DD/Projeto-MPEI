@@ -6,22 +6,22 @@ import util.TimeThis;
 import java.io.*;
 import java.util.*;
 
+import static util.Enviroment.*;
+
 public class MinHash implements Serializable {
     int[] signature;
-    MinHashSeed mhs;
 
-    public MinHash(List<Integer> set, MinHashSeed mhs) {
-        this.mhs = mhs;
+    public MinHash(List<Integer> set) {
         TimeThis t;
         if (set.size() < 100)
             t = new TimeThis("MinHash Titulo", "v");
         else
             t = new TimeThis("MinHash Conteudo", "v");
-        signature = new int[mhs.size];
-        for (var i = 0; i < mhs.size; i++) {
+        signature = new int[minHashSeed.size];
+        for (var i = 0; i < minHashSeed.size; i++) {
             int min = Integer.MAX_VALUE;
             for (var item : set) {
-                int c_hash = (mhs.a[i] * item + mhs.b[i]);
+                int c_hash = (minHashSeed.a[i] * item + minHashSeed.b[i]);
                 if (c_hash < min) min = c_hash;
             }
             signature[i] = min;

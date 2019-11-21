@@ -6,20 +6,20 @@ import util.Mutable;
 import java.io.File;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import static util.Enviroment.countingProgress;
 
 public class FileToBookProcessor extends Thread {
     ConcurrentLinkedQueue<Book> toProcessTitle, toProcessContent;
     File dir;
     Mutable<Boolean> finished;
     Mutable<Double> progress;
+
     public FileToBookProcessor(
             ConcurrentLinkedQueue<Book> toProcessTitle,
             ConcurrentLinkedQueue<Book> toProcessContent,
             File dir,
             Mutable<Boolean> finished,
             Mutable<Double> progress
-            ) {
+    ) {
         this.toProcessTitle = toProcessTitle;
         this.dir = dir;
         this.finished = finished;
@@ -33,7 +33,7 @@ public class FileToBookProcessor extends Thread {
                 File[] files = dir.listFiles();
                 for (int i = 0; i < files.length; i++) {
                     if (files[i].isFile()) {
-                        if (toProcessContent.size() > 150)
+                        if (toProcessContent.size() > 20)
                             try {
                                 sleep(1000);
                             } catch (InterruptedException ie) {
@@ -42,7 +42,7 @@ public class FileToBookProcessor extends Thread {
                         Book b = new Book(files[i]);
                         toProcessTitle.add(b);
                     }
-                    if (countingProgress && (i % (files.length / 100) == 0))
+                    if ((i % (files.length / 100) == 0))
                         progress.set((double) i / files.length);
                 }
             } catch (NullPointerException e) {

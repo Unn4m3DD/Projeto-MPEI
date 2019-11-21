@@ -10,25 +10,22 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import static util.Enviroment.titleShingleSize;
+import static util.Enviroment.*;
 
 public class BookTitleProcessor extends Thread {
     ConcurrentLinkedQueue<Book> toProcessTitle, toProcessContent;
     HashMap<String, ProcessedBooksResult> result;
     Mutable<Boolean> finished;
-    MinHashSeed minHashSeed;
 
     public BookTitleProcessor(
             ConcurrentLinkedQueue<Book> toProcessTitle,
             ConcurrentLinkedQueue<Book> toProcessContent,
             Mutable<Boolean> finished,
-            HashMap<String, ProcessedBooksResult> result,
-            MinHashSeed minHashSeed
+            HashMap<String, ProcessedBooksResult> result
     ) {
         this.toProcessTitle = toProcessTitle;
         this.finished = finished;
         this.result = result;
-        this.minHashSeed = minHashSeed;
         this.toProcessContent = toProcessContent;
     }
 
@@ -52,7 +49,7 @@ public class BookTitleProcessor extends Thread {
                 b = toProcessTitle.poll();
             }
             try {
-                sleep(1000);
+                sleep(200);
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
             }
