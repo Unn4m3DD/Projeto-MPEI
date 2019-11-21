@@ -2,10 +2,7 @@ package Threads;
 
 import modules.MinHash;
 import modules.MinHashSeed;
-import util.Book;
-import util.Enviroment;
-import util.MutableBoolean;
-import util.ProcessedBooksResult;
+import util.*;
 
 import java.io.File;
 import java.util.HashMap;
@@ -32,8 +29,8 @@ public class BookContentProcessor extends Thread {
         do {
             Book b = toProcessContent.poll();
             while (b != null) {
-                MinHash minHashedContent = new MinHash(MinHash.shinglesFromFile(b.getContent(), Enviroment.contentShingleSize), minHashSeed);
-
+                TimeThis t = new TimeThis("1 contentMinHash", "v");
+                MinHash minHashedContent = new MinHash(MinHash.shinglesFromCharArr(b.getContent(), Enviroment.contentShingleSize), minHashSeed);
                 if (!result.containsKey(b.getName())) {
                     ProcessedBooksResult innerResult = new ProcessedBooksResult();
                     innerResult.minHashedContent = minHashedContent;
@@ -42,6 +39,7 @@ public class BookContentProcessor extends Thread {
                     result.get(b.getName()).minHashedContent = minHashedContent;
                 }
                 b = toProcessContent.poll();
+                t.end();
             }
         }while (!finished.getB());
 

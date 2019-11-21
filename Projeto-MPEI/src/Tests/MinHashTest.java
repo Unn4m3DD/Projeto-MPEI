@@ -14,8 +14,6 @@ public class MinHashTest {
     public static MinHashSeed mhs;
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        TimeThis.currentlyTiming = true;
-        TimeThis.verbose = false;
         fw = new FileWriter(new File("results.txt"));
 //        File d = new File("books\\TestBase");
         File d = new File("books\\English");
@@ -26,16 +24,15 @@ public class MinHashTest {
             books.add(new Book(f));
         }
         t.end();
-/*
         listFiles = d.listFiles();
-        HashMap<String, modules.MinHash> mhList = new HashMap<>();
+        HashMap<String, MinHash> mhList = new HashMap<>();
         mhList = create();
         save(mhList, mhs);
 //        var saved = load();
 //        mhList = saved.mh;
 //        mhs = saved.mhs;
         ArrayList<String> testedKeys = new ArrayList<>();
-        util.TimeThis t = new util.TimeThis("Round of comp", "e");
+        t = new util.TimeThis("Round of comp", "e");
         for (var key1 : mhList.keySet()) {
             testedKeys.add(key1);
             for (var key2 : mhList.keySet()) {
@@ -56,7 +53,6 @@ public class MinHashTest {
         t.end();
         fw.flush();
 
- */
     }
 
     private static HashMap<String, MinHash> create() {

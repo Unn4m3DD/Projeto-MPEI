@@ -37,7 +37,7 @@ public class BookTitleProcessor extends Thread {
             Book b = toProcessTitle.poll();
             while (b != null) {
                 toProcessContent.add(b);
-                MinHash minHashedTitle = new MinHash(MinHash.shinglesFromFile(b.getTitle(), Enviroment.titleShingleSize), minHashSeed);
+                MinHash minHashedTitle = new MinHash(MinHash.shinglesFromCharArr(b.getTitle(), Enviroment.titleShingleSize), minHashSeed);
 
                 ProcessedBooksResult.titlesBloomFilter.addElement(b.getTitle().toString());
 

@@ -1,5 +1,6 @@
 package modules;
 
+import util.Book;
 import util.TimeThis;
 
 import java.io.*;
@@ -13,7 +14,7 @@ public class MinHash implements Serializable {
 
     public MinHash(List<String> set, MinHashSeed mhs) {
         this.mhs = mhs;
-        TimeThis t = new TimeThis("modules.MinHash");
+        TimeThis t = new TimeThis("MinHash", "v");
         signature = new int[mhs.size];
         for (var i = 0; i < mhs.size; i++) {
             int min = Integer.MAX_VALUE;
@@ -27,7 +28,7 @@ public class MinHash implements Serializable {
     }
 
     public static HashMap<String, MinHash> fromFileList(File[] listFiles, MinHashSeed mhs, int shingleSize) {
-        TimeThis t = new TimeThis("Minhash from file list ", "e");
+        TimeThis t = new TimeThis("Minhash from file list ", "v");
         HashMap<String, MinHash> result = new HashMap<String, MinHash>();
         int threadCount = 4;
         Thread[] ts = new Thread[threadCount];
@@ -61,8 +62,8 @@ public class MinHash implements Serializable {
         return (double) counter / (double) signature.length;
     }
 
-    public static List<String> shinglesFromFile(ArrayList<Character> charArr, int size) {
-        TimeThis t = new TimeThis("Shingle Creation");
+    public static List<String> shinglesFromCharArr(ArrayList<Character> charArr, int size) {
+        TimeThis t = new TimeThis("Shingle Creation", "v");
         ArrayList<String> result = new ArrayList<>();
         for (var i = 0; i + size < charArr.size(); i++) {
             result.add("");
@@ -111,7 +112,9 @@ class FromFileListHelper extends Thread {
 
     public void run() {
         for (int i = min_idx; i < max_idx; i++) {
-//            result.put(listFiles[i].getName(), new modules.MinHash(modules.MinHash.shinglesFromFile(listFiles[i], shingleSize), mhs));
+            result.put(listFiles[i].getName(), new modules.MinHash(modules.MinHash.shinglesFromCharArr(
+                    (new Book(listFiles[i]).getContent())
+                    , shingleSize), mhs));
 //            if (((i - min_idx) % ((max_idx - min_idx) / 1)) == 0) {
 //                System.out.println((double) (i - min_idx) / (max_idx - min_idx));
 //            }

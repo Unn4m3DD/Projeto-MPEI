@@ -22,13 +22,13 @@ public class BookDirectoryProcessor {
     BookDirectoryProcessor(File dir) {
         MinHashSeed mhs = new MinHashSeed(Enviroment.numberOfHashesForMinHash);
         Thread[] threads = new Thread[6];
-        threads[0] = new FileToBookProcessor(toProcessTitle, toProcessContent, dir, finished, t0ShouldSleep);
+        threads[0] = new FileToBookProcessor(toProcessTitle, toProcessContent, dir, finished);
         threads[1] = new BookTitleProcessor(toProcessTitle, toProcessContent, finished, result, mhs);
         threads[2] = new BookContentProcessor(toProcessContent, finished, result, mhs);
         threads[3] = new BookContentProcessor(toProcessContent, finished, result, mhs);
         threads[4] = new BookContentProcessor(toProcessContent, finished, result, mhs);
         threads[5] = new BookContentProcessor(toProcessContent, finished, result, mhs);
-        for (var i = 0; i < 6; i++) threads[i].start();
+        for (var i = 0; i < threads.length; i++) threads[i].start();
 
         while (!finished.getB()) {
             try {
