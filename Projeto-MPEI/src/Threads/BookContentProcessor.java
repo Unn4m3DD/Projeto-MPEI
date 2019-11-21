@@ -8,6 +8,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import static util.Enviroment.contentShingleSize;
+
 public class BookContentProcessor extends Thread {
     ConcurrentLinkedQueue<Book> toProcessContent;
     HashMap<String, ProcessedBooksResult> result;
@@ -30,7 +32,7 @@ public class BookContentProcessor extends Thread {
             Book b = toProcessContent.poll();
             while (b != null) {
                 TimeThis t = new TimeThis("1 contentMinHash", "v");
-                MinHash minHashedContent = new MinHash(MinHash.shinglesFromCharArr(b.getContent(), Enviroment.contentShingleSize), minHashSeed);
+                MinHash minHashedContent = new MinHash(MinHash.shinglesFromCharArr(b.getContent(), contentShingleSize), minHashSeed);
                 if (!result.containsKey(b.getName())) {
                     ProcessedBooksResult innerResult = new ProcessedBooksResult();
                     innerResult.minHashedContent = minHashedContent;

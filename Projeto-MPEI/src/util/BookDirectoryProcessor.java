@@ -3,6 +3,7 @@ package util;
 import Threads.BookContentProcessor;
 import Threads.BookTitleProcessor;
 import Threads.FileToBookProcessor;
+import modules.MinHash;
 import modules.MinHashSeed;
 
 import java.io.File;
@@ -11,6 +12,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import static util.Enviroment.numberOfHashesForMinHash;
+
+
 public class BookDirectoryProcessor {
     ConcurrentLinkedQueue<Book>
             toProcessTitle = new ConcurrentLinkedQueue<>(),
@@ -18,9 +22,8 @@ public class BookDirectoryProcessor {
     MutableBoolean finished = new MutableBoolean(false), t0ShouldSleep = new MutableBoolean(false),
             t4ShouldSleep = new MutableBoolean(true);
     HashMap<String, ProcessedBooksResult> result = new HashMap<String, ProcessedBooksResult>();
-
     BookDirectoryProcessor(File dir) {
-        MinHashSeed mhs = new MinHashSeed(Enviroment.numberOfHashesForMinHash);
+        MinHashSeed mhs = new MinHashSeed(numberOfHashesForMinHash);
         Thread[] threads = new Thread[6];
         threads[0] = new FileToBookProcessor(toProcessTitle, toProcessContent, dir, finished);
         threads[1] = new BookTitleProcessor(toProcessTitle, toProcessContent, finished, result, mhs);
@@ -28,11 +31,12 @@ public class BookDirectoryProcessor {
         threads[3] = new BookContentProcessor(toProcessContent, finished, result, mhs);
         threads[4] = new BookContentProcessor(toProcessContent, finished, result, mhs);
         threads[5] = new BookContentProcessor(toProcessContent, finished, result, mhs);
+//        threads[6] = new BookContentProcessor(toProcessContent, finished, result, mhs);
         for (var i = 0; i < threads.length; i++) threads[i].start();
 
-        while (!finished.getB()) {
+        while (threads[3].isAlive()) {
             try {
-                Thread.sleep(5000);
+                Thread.sleep(1000);
                 System.gc();
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
@@ -53,6 +57,7 @@ public class BookDirectoryProcessor {
 //        File d = new File("books\\English");
         File d = new File("books\\Spanish");
         TimeThis.currentlyTiming = true;
+
         TimeThis t = new TimeThis("Processamento para MinHash e BloomFilter", "e");
         BookDirectoryProcessor bookDirectoryProcessor = new BookDirectoryProcessor(d);
         t.end();
@@ -65,6 +70,7 @@ public class BookDirectoryProcessor {
             testedKeys.add(key1);
             for (var key2 : result.keySet()) {
                 if (testedKeys.contains(key2))
+
                     continue;
                 var m1 = result.get(key1).minHashedContent;
                 var m2 = result.get(key2).minHashedContent;

@@ -4,22 +4,20 @@ import util.Book;
 import util.TimeThis;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class MinHash implements Serializable {
     int[] signature;
     MinHashSeed mhs;
-
-    public MinHash(List<String> set, MinHashSeed mhs) {
+    public static HashMap<String, int[]> knownMinHashes = new HashMap<>();
+    public MinHash(List<Integer> set, MinHashSeed mhs) {
         this.mhs = mhs;
         TimeThis t = new TimeThis("MinHash", "v");
         signature = new int[mhs.size];
         for (var i = 0; i < mhs.size; i++) {
             int min = Integer.MAX_VALUE;
-            for (var idx = 0; idx < set.size(); idx++) {
-                int c_hash = (mhs.a[i] * set.get(idx).hashCode() + mhs.b[i]);
+            for (var item: set) {
+                int c_hash = (mhs.a[i] * item + mhs.b[i]);
                 if (c_hash < min) min = c_hash;
             }
             signature[i] = min;
@@ -62,14 +60,16 @@ public class MinHash implements Serializable {
         return (double) counter / (double) signature.length;
     }
 
-    public static List<String> shinglesFromCharArr(ArrayList<Character> charArr, int size) {
+    public static List<Integer> shinglesFromCharArr(ArrayList<Character> charArr, int size) {
         TimeThis t = new TimeThis("Shingle Creation", "v");
-        ArrayList<String> result = new ArrayList<>();
+        ArrayList<Integer> result = new ArrayList<>();
+
         for (var i = 0; i + size < charArr.size(); i++) {
-            result.add("");
+            StringBuilder toAdd = new StringBuilder();
             for (var j = 0; j < size; j++) {
-                result.set(i, result.get(i) + charArr.get(i + j));
+                toAdd.append(charArr.get(i + j));
             }
+            result.add(toAdd.toString().hashCode());
         }
         t.end();
         return result;

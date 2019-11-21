@@ -3,13 +3,14 @@ package Threads;
 import modules.MinHash;
 import modules.MinHashSeed;
 import util.Book;
-import util.Enviroment;
 import util.MutableBoolean;
 import util.ProcessedBooksResult;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import static util.Enviroment.titleShingleSize;
 
 public class BookTitleProcessor extends Thread {
     ConcurrentLinkedQueue<Book> toProcessTitle, toProcessContent;
@@ -37,7 +38,7 @@ public class BookTitleProcessor extends Thread {
             Book b = toProcessTitle.poll();
             while (b != null) {
                 toProcessContent.add(b);
-                MinHash minHashedTitle = new MinHash(MinHash.shinglesFromCharArr(b.getTitle(), Enviroment.titleShingleSize), minHashSeed);
+                MinHash minHashedTitle = new MinHash(MinHash.shinglesFromCharArr(b.getTitle(), titleShingleSize), minHashSeed);
 
                 ProcessedBooksResult.titlesBloomFilter.addElement(b.getTitle().toString());
 
