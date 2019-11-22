@@ -21,7 +21,7 @@ public class MinHashSeed implements Serializable {
     }
 
 
-    int randAB() {
+    private int randAB() {
         return (int) Math.floor(Math.random() * (Integer.MAX_VALUE - 2)) * (Math.random() > .5 ? -1 : 1);
 
     }

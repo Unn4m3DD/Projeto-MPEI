@@ -5,9 +5,9 @@ import modules.BloomFilter;
 import java.io.File;
 import java.util.*;
 
-public class BloomFilterTest {
-    static int testWeight = 100;
-    static double accuracy = .1;
+class BloomFilterTest {
+    private static int testWeight = 100;
+    private static double accuracy = .1;
 
     public static void main(String[] args) {
         optimalKFullTest();
@@ -19,7 +19,7 @@ public class BloomFilterTest {
     private static void falsePositiveFullTest(BloomFilter b) {
         System.out.print("Teste de falsos positivos em execução: ");
         File book = new File("mises.txt");
-        Set<String> wordSet = new HashSet<String>();
+        Set<String> wordSet = new HashSet<>();
         try (Scanner k = new Scanner(book)) {
             while (k.hasNext()) {
                 wordSet.add(k.next());
@@ -49,14 +49,14 @@ public class BloomFilterTest {
         for (var i = 0; i < 10000; i++) {
             if (b.isElement(randomString())) count++;
         }
-        var err = (double) count / 10000;
-        return err;
+
+        return (double) count / 10000;
     }
 
     private static void falseNegativeTest(BloomFilter b) {
         System.out.print("Teste de falsos negativos em execução ");
         File book = new File("mises.txt");
-        Set<String> wordSet = new HashSet<String>();
+        Set<String> wordSet = new HashSet<>();
         try (Scanner k = new Scanner(book)) {
             while (k.hasNext()) {
                 wordSet.add(k.next());
@@ -84,7 +84,7 @@ public class BloomFilterTest {
         return b;
     }
 
-    public static String randomString() {
+    private static String randomString() {
         int leftLimit = 97; // letter 'a'
         int rightLimit = 122; // letter 'z'
         int targetStringLength = 50;
