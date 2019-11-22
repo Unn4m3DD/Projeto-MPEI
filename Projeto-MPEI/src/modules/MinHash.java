@@ -29,6 +29,27 @@ public class MinHash implements Serializable {
 
     }
 
+
+
+    public MinHash(List<Integer> set, MinHashSeed minHashSeed) {
+        TimeThis t;
+        if (set.size() < 100)
+            t = new TimeThis("MinHash Titulo", "v");
+        else
+            t = new TimeThis("MinHash Conteudo", "v");
+        signature = new int[minHashSeed.size];
+        for (var i = 0; i < minHashSeed.size; i++) {
+            int min = Integer.MAX_VALUE;
+            for (var item : set) {
+                int c_hash = (minHashSeed.a[i] * item + minHashSeed.b[i]);
+                if (c_hash < min) min = c_hash;
+            }
+            signature[i] = min;
+        }
+        t.end();
+
+    }
+
     public double calcSimTo(MinHash m) {
         TimeThis t = new TimeThis("CalcSim", "vv");
         int counter = 0;
