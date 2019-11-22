@@ -12,14 +12,14 @@ public class CountFilter {
 
     //para requisitar usar-se-há este método
     public void addElement(String elem, BloomFilter bloom) {
-        if (bloom.isElement(elem) && ! isElement(elem)){  //verifica se o livro existe na biblioteca e não está requisitado
+        if (bloom.isElement(elem) && !isElement(elem)) {  //verifica se o livro existe na biblioteca e não está requisitado
             var cond = true;
             for (var i = 0; i < k; i++) {
                 //a hash usada vai variando segundo a iteração, assim usamos 2 métodos de "hashar" diferentes
                 if (cond)
-                    filter[Math.abs((elem + i).hashCode() % n)] ++;
+                    filter[Math.abs((elem + i).hashCode() % n)]++;
                 else
-                    filter[string2hash(elem, n, i)] ++;
+                    filter[string2hash(elem, n, i)]++;
                 cond = !cond;
             }
         }
@@ -41,12 +41,12 @@ public class CountFilter {
     }
 
 
-    public boolean returnBook(String elem, BloomFilter bloom){  //returns true if it was returned, returns false if wasn't
-        if (! isElement(elem)) {
+    public boolean returnBook(String elem, BloomFilter bloom) {  //returns true if it was returned, returns false if wasn't
+        if (!isElement(elem)) {
             System.out.println("Book was not taken from the library");
             return false;
         }
-        if (! bloom.isElement(elem)) {
+        if (!bloom.isElement(elem)) {
             System.out.println("Book doesn't exist in the library");
             return false;
         }
@@ -54,9 +54,9 @@ public class CountFilter {
         for (var i = 0; i < k; i++) {
             //código do método addElement() mas em vez de incrementar decrementa
             if (cond)
-                filter[Math.abs((elem + i).hashCode() % n)] --;
+                filter[Math.abs((elem + i).hashCode() % n)]--;
             else
-                filter[string2hash(elem, n, i)] --;
+                filter[string2hash(elem, n, i)]--;
             cond = !cond;
         }
         return true;

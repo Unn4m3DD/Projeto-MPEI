@@ -8,8 +8,7 @@ import util.ProcessedBooksResult;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import static util.Enviroment.minHashSeed;
-import static util.Enviroment.titleShingleSize;
+import static util.Enviroment.*;
 
 public class BookTitleProcessor extends Thread {
     private ConcurrentLinkedQueue<Book> toProcessTitle;
@@ -35,7 +34,7 @@ public class BookTitleProcessor extends Thread {
             Book b = toProcessTitle.poll();
             while (b != null) {
                 toProcessContent.add(b);
-                MinHash minHashedTitle = new MinHash(MinHash.shinglesFromCharArr(b.getTitle(), titleShingleSize), minHashSeed);
+                MinHash minHashedTitle = new MinHash(MinHash.shinglesFromCharArr(b.getTitle(), titleShingleSize));
 
                 ProcessedBooksResult.titlesBloomFilter.addElement(b.getTitle().toString());
 
