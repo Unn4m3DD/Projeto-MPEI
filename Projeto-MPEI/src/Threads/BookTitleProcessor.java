@@ -34,18 +34,18 @@ public class BookTitleProcessor extends Thread {
 
             Book b = toProcessTitle.poll();
             while (b != null) {
-                toProcessContent.add(b);
-                MinHash minHashedTitle = new MinHash(MinHash.shinglesFromCharArr(b.getTitle(), titleShingleSize), minHashSeed);
+                MinHash minHashedTitle = new MinHash(MinHash.shinglesFromCharArr(b.getTitle(), titleShingleSize));
 
                 ProcessedBooksResult.titlesBloomFilter.addElement(b.getTitle().toString());
 
-                if (!result.containsKey(b.getName())) {
+//                if (!result.containsKey(b.getName())) {
                     ProcessedBooksResult innerResult = new ProcessedBooksResult();
                     innerResult.minHashedTitle = minHashedTitle;
                     result.put(b.getName(), innerResult);
-                } else {
-                    result.get(b.getName()).minHashedTitle = minHashedTitle;
-                }
+//                } else {
+//                    result.get(b.getName()).minHashedTitle = minHashedTitle;
+//                }
+                toProcessContent.add(b);
                 b = toProcessTitle.poll();
             }
             try {

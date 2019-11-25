@@ -8,7 +8,7 @@ import java.io.File;
 import java.util.HashMap;
 
 class Interface {
-    private static HashMap<String, ProcessedBooksResult> currentData;
+    private static HashMap<String, ProcessedBooksResult> currentData = new HashMap<>();
     private static File currentDir = new File("books\\Spanish");
 
     public static void parseDirectory(Mutable<Double> progress) {
