@@ -8,8 +8,7 @@ import util.ProcessedBooksResult;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import static util.Enviroment.minHashSeed;
-import static util.Enviroment.titleShingleSize;
+import static util.Environment.titleShingleSize;
 
 public class BookTitleProcessor extends Thread {
     private ConcurrentLinkedQueue<Book> toProcessTitle;

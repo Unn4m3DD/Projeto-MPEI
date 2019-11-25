@@ -34,7 +34,7 @@ public class BookDirectoryProcessor extends Thread {
         threads[3] = new BookContentProcessor(toProcessContent, finished, result);
         threads[4] = new BookContentProcessor(toProcessContent, finished, result);
         threads[5] = new BookContentProcessor(toProcessContent, finished, result);
-//        threads[6] = new BookContentProcessor(toProcessContent, finished, result, minHashSeed);
+//        threads[6] = new BookContentProcessor(toProcessContent, finished, result, hashSeed);
         for (Thread thread : threads) thread.start();
 
         while (threads[3].isAlive()) {
@@ -50,11 +50,12 @@ public class BookDirectoryProcessor extends Thread {
         for (var i = 0; i < threads.length; i++) {
             try {
                 threads[i].join();
-                System.out.println("Thread " + i + " joined");
+//                System.out.println("Thread " + i + " joined");
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
             }
         }
+        progress.set(1.0);
         t1.end();
         TimeThis.printAllDelays();
 
