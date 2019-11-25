@@ -265,11 +265,11 @@ class GUI {
 
         //header
         JLabel text = new JLabel();
-        text.setText("Insert book name");
+        text.setText("Insert title to search");
         JPanel textPanel = new JPanel();
         textPanel.add(text);
         textPanel.setPreferredSize(new Dimension(500,100));
-        textPanel.setLocation(p.getWidth(), p.getHeight()/3);
+        textPanel.setLocation(p.getWidth(), p.getHeight()/3);// <- DOESN'T WORK
         p.add(textPanel);
 
         //textfield
@@ -281,6 +281,18 @@ class GUI {
         insertPanel.setLocation(p.getWidth(), p.getHeight()*2/3);
         p.add(insertPanel);
 
+        JButton search = new JButton();
+        search.setText("Search");
+        search.addActionListener((e)->{
+            String book=title.getText();
+            findSimilarTitle(book);
+        });
+        search.setSize(new Dimension(300,100));
+        p.add(search);
+        search.addActionListener((e)-> {
+
+        });
+
 
         p.setSize(500,300);
         int x = (screenSize.width - p.getWidth()) / 2;
@@ -288,6 +300,26 @@ class GUI {
         p.setLocation(x,y);
         p.setVisible(true);
         p.setResizable(false);
+    }
+
+    private static void findSimilarTitle(String book) {
+        JFrame window = new JFrame();
+        window.setLayout(new FlowLayout());
+        //title sort of
+        JLabel text = new JLabel("Similar titles found");
+        text.setSize(new Dimension(500,100));
+        window.add(text);
+
+        //file thingy
+
+
+        //JFrame settings
+        window.setSize(500,300);
+        int x = (screenSize.width - window.getWidth()) / 2;
+        int y = (screenSize.height - window.getHeight()) / 2;
+        window.setLocation(x,y);
+        window.setVisible(true);
+        window.setResizable(false);
     }
 
     public static void loadingExample() {
