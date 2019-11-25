@@ -3,7 +3,7 @@ package util;
 import modules.BloomFilter;
 import modules.HashSeed;
 
-public abstract class Enviroment {
+public abstract class Environment {
     public static int bloomFilterN = 1000;
     public static int bloomFilterK = BloomFilter.optimalK(1000, 5000);
     public static int titleShingleSize = 4;

@@ -5,7 +5,7 @@ import util.TimeThis;
 import java.io.*;
 import java.util.*;
 
-import static util.Enviroment.*;
+import static util.Environment.*;
 
 public class MinHash implements Serializable {
     private int[] signature;

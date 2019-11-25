@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 
+import static util.Environment.hashSeed;
+
 public class BloomFilter {
     private int n, k;
     private boolean[] filter;
@@ -47,35 +49,22 @@ public class BloomFilter {
     }
 
     public void addElement(String elem) {
-        var cond = true;
         for (var i = 0; i < k; i++) {
-            if (cond) filter[Math.abs((elem + i).hashCode() % n)] = true;
-            else filter[string2hash(elem, n, i)] = true;
-            cond = !cond;
+            filter[hash(elem, i)] = true;
         }
+    }
+
+    private int hash(String elem, int i) {
+        return Math.abs(hashSeed.a[i] * (elem).hashCode() + hashSeed.b[i]) % n;
     }
 
     public boolean isElement(String elem) {
-        var cond = true;
         for (var i = 0; i < k; i++) {
-            if (cond && !filter[Math.abs((elem + i).hashCode() % n)]) {
-                return false;
-            } else if (!cond && !filter[string2hash(elem, n, i)]) {
+            if (!filter[hash(elem, i)]) {
                 return false;
             }
-            cond = !cond;
         }
         return true;
-    }
-
-    private int string2hash(String s, int mod, int seed) {
-        long result = (long) Math.pow(seed, seed * 3);
-        char[] ca = s.toCharArray();
-        for (var c : ca) {
-            result = result * 31 + c;
-        }
-        result = Math.abs(result);
-        return (int) (result % mod);
     }
 
     public int getN() {

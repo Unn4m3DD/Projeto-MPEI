@@ -6,7 +6,7 @@ import util.*;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import static util.Enviroment.*;
+import static util.Environment.*;
 
 public class BookContentProcessor extends Thread {
     private ConcurrentLinkedQueue<Book> toProcessContent;
