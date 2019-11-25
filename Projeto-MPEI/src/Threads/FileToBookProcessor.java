@@ -32,6 +32,7 @@ public class FileToBookProcessor extends Thread {
         if (dir.isDirectory())
             try {
                 File[] files = dir.listFiles();
+                int pace = (files.length / 100);
                 for (int i = 0; i < files.length; i++) {
                     if (files[i].isFile()) {
                         if (toProcessContent.size() > 20)
@@ -43,7 +44,7 @@ public class FileToBookProcessor extends Thread {
                         Book b = new Book(files[i]);
                         toProcessTitle.add(b);
                     }
-                    if ((i % (files.length / 100) == 0))
+                    if ((pace != 0) && (i % (pace) == 0))
                         progress.set((double) i / files.length);
                 }
             } catch (NullPointerException e) {

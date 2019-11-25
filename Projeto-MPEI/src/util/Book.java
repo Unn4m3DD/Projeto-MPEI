@@ -11,7 +11,7 @@ public class Book {
     private ArrayList<Character> title = new ArrayList<>(), content = new ArrayList<>();
     private String name;
     public Book(File f) {
-        TimeThis t = new TimeThis("File to util.Book ");
+        TimeThis t = new TimeThis("File to Book ");
         name = f.getName();
         boolean titleFetched = false;
         try (Scanner s = new Scanner(f)) {

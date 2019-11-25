@@ -39,7 +39,7 @@ public class BookDirectoryProcessor extends Thread {
 
         while (threads[3].isAlive()) {
             try {
-                Thread.sleep(5000);
+                Thread.sleep(1000);
                 TimeThis t = new TimeThis("Garbage collector delay", "v");
                 System.gc();
                 t.end();
