@@ -1,13 +1,14 @@
 package modules;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 
 import static util.Environment.hashSeed;
 
-public class BloomFilter {
+public class BloomFilter implements Serializable {
     private int n, k;
     private boolean[] filter;
 

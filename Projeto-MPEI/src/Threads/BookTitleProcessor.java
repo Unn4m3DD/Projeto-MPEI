@@ -35,12 +35,18 @@ public class BookTitleProcessor extends Thread {
             while (b != null) {
                 MinHash minHashedTitle = new MinHash(MinHash.shinglesFromCharArr(b.getTitle(), titleShingleSize));
 
-                ProcessedBooksResult.titlesBloomFilter.addElement(b.getTitle().toString());
+                StringBuilder sb = new StringBuilder();
+                for (var c : b.getTitle()) {
+                    sb.append(c);
+                }
+                ProcessedBooksResult.titlesBloomFilter.addElement(sb.toString().trim());
 
 //                if (!result.containsKey(b.getName())) {
-                    ProcessedBooksResult innerResult = new ProcessedBooksResult();
-                    innerResult.minHashedTitle = minHashedTitle;
-                    result.put(b.getName(), innerResult);
+                ProcessedBooksResult innerResult = new ProcessedBooksResult();
+                innerResult.minHashedTitle = minHashedTitle;
+
+                innerResult.name = sb.toString().trim();
+                result.put(b.getName(), innerResult);
 //                } else {
 //                    result.get(b.getName()).minHashedTitle = minHashedTitle;
 //                }

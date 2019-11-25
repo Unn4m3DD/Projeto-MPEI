@@ -10,6 +10,7 @@ import java.util.Scanner;
 public class Book {
     private ArrayList<Character> title = new ArrayList<>(), content = new ArrayList<>();
     private String name;
+
     public Book(File f) {
         TimeThis t = new TimeThis("File to Book ");
         name = f.getName();
@@ -17,11 +18,12 @@ public class Book {
         try (Scanner s = new Scanner(f)) {
             while (s.hasNextLine()) {
                 String c_line = s.nextLine();
-                if (!titleFetched && c_line.split(":")[0].equals("Title"))
+                if (!titleFetched && c_line.split(":")[0].equals("Title")) {
                     for (var c : c_line.split(":")[1].trim().toCharArray()) {
-                        titleFetched = true;
                         title.add(c);
                     }
+                    titleFetched = true;
+                }
                 for (var c : c_line.toCharArray()) {
                     content.add(c);
                 }
