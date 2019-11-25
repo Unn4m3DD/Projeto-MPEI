@@ -3,6 +3,7 @@ package modules;
 import util.TimeThis;
 
 import java.io.Serializable;
+import java.util.Random;
 
 public class HashSeed implements Serializable {
     int[] a, b;
@@ -13,16 +14,11 @@ public class HashSeed implements Serializable {
         this.size = size;
         a = new int[size];
         b = new int[size];
+        Random generator = new Random("Seed constante para comparar varias bibliotecas".hashCode());
         for (var i = 0; i < size; i++) {
-            a[i] = randAB();
-            b[i] = randAB();
+            a[i] = generator.nextInt();
+            b[i] = generator.nextInt();
         }
         t.end();
-    }
-
-
-    private int randAB() {
-        return (int) Math.floor(Math.random() * (Integer.MAX_VALUE - 2)) * (Math.random() > .5 ? -1 : 1);
-
     }
 }
