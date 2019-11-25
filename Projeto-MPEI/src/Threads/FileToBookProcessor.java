@@ -34,7 +34,7 @@ public class FileToBookProcessor extends Thread {
                 File[] files = dir.listFiles();
                 for (int i = 0; i < files.length; i++) {
                     if (files[i].isFile()) {
-                        if (toProcessContent.size() > 150)
+                        if (toProcessContent.size() > 20)
                             try {
                                 sleep(1000);
                             } catch (InterruptedException ie) {

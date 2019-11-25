@@ -21,12 +21,13 @@ class GUI {
         p.add(pr);
         p.add(b);
         JFrame j = new JFrame();
+        j.setSize(400,100);
         j.add(p);
         j.setVisible(true);
         final SwingWorker w = new SwingWorker() {
             @Override
             protected Object doInBackground() throws Exception {
-                while (progress.get() < 0.98) {
+                do {
                     try {
                         double p = progress.get();
                         pr.setValue((int) (p * 100));
@@ -36,7 +37,10 @@ class GUI {
                     } catch (InterruptedException ex) {
                         ex.printStackTrace();
                     }
-                }
+                }while (progress.get() != 1.0);
+                pr.setValue((int) (100));
+                j.repaint();
+                pr.setString((int) (100) + "%");
                 return 0;
             }
         };
