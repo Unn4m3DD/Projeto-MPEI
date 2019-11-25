@@ -262,6 +262,7 @@ class GUI {
     private static void searchTitle() {
         JFrame p = new JFrame();
         p.setLayout(new FlowLayout());
+
         //header
         JLabel text = new JLabel();
         text.setText("Insert book name");
@@ -270,6 +271,7 @@ class GUI {
         textPanel.setPreferredSize(new Dimension(500,100));
         textPanel.setLocation(p.getWidth(), p.getHeight()/3);
         p.add(textPanel);
+
         //textfield
         JTextField title = new JTextField();
         title.setPreferredSize(new Dimension(300,100));
@@ -286,7 +288,6 @@ class GUI {
         p.setLocation(x,y);
         p.setVisible(true);
         p.setResizable(false);
-        p.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
     public static void loadingExample() {
