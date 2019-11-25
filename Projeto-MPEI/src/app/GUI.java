@@ -348,7 +348,7 @@ class GUI {
                     } catch (InterruptedException ex) {
                         ex.printStackTrace();
                     }
-                }while (progress.get() != 1.0);
+                }while (!progress.get().equals(1.0));
                 pr.setValue((int) (100));
                 j.repaint();
                 pr.setString((int) (100) + "%");
