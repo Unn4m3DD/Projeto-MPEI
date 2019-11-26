@@ -5,6 +5,8 @@ import util.TimeThis;
 import java.io.*;
 import java.util.*;
 
+import static modules.Hash.hash;
+import static modules.Hash.hashSeed;
 import static util.Environment.*;
 
 public class MinHash implements Serializable {
@@ -20,7 +22,7 @@ public class MinHash implements Serializable {
         for (var i = 0; i < hashSeed.size; i++) {
             int min = Integer.MAX_VALUE;
             for (var item : set) {
-                int c_hash = (hashSeed.a[i] * item + hashSeed.b[i]);
+                int c_hash = hash(item,i);
                 if (c_hash < min) min = c_hash;
             }
             signature[i] = min;

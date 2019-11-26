@@ -1,9 +1,13 @@
-package util;
+package Threads;
 
 import Threads.BookContentProcessor;
 import Threads.BookTitleProcessor;
 import Threads.FileToBookProcessor;
 import modules.BloomFilter;
+import util.Book;
+import util.Mutable;
+import util.ProcessedBooksResult;
+import util.TimeThis;
 
 import java.io.File;
 import java.util.ArrayList;

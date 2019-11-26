@@ -1,5 +1,6 @@
 package app;
 
+import Threads.BookDirectoryProcessor;
 import modules.BloomFilter;
 import modules.CountFilter;
 import modules.MinHash;
@@ -25,18 +26,18 @@ class Interface {
     //This function may not download numOfBooks, this argument is just an indication
     public static void downloadTestData(int numOfBooks) {
         System.err.println("não te esqueças de indicar que o argumento é meramente indicativo");
-        new BookCrawler(numOfBooks, currentDir);
+        new BookDownloader(numOfBooks, currentDir);
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         Mutable<Double> prog = new Mutable<>(0.0);
         parseDirectory(prog);
         while (!prog.get().equals(1.0))
-           try{
-               Thread.sleep(1000);
-           } catch (InterruptedException ie){
-               ie.printStackTrace();
-           }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ie) {
+                ie.printStackTrace();
+            }
         save(new File("savetest.ser"));
         load(new File("savetest.ser"));
         System.out.println(searchBook("Merodeadores ", .1));
@@ -48,6 +49,7 @@ class Interface {
     public static boolean checkBook(String name) {
         return availableBooks.isElement(name);
     }
+
 
     public static List<ProcessedBooksResult> searchBook(String name, double thr) {
         ArrayList<ProcessedBooksResult> result = new ArrayList<>();
@@ -68,11 +70,24 @@ class Interface {
         return result;
     }
 
-    public static double compareBooks(ProcessedBooksResult b1, ProcessedBooksResult b2){
+    public static boolean requestBook(String name){
+        if(!availableBooks.isElement(name)) return false;
+        if(stock.isElement(name)) return  false;
+        stock.addElement(name);
+        return true;
+    }
+    public static boolean returnBook(String name){
+        if(!availableBooks.isElement(name)) return false;
+        if(!stock.isElement(name)) return  false;
+        stock.remElement(name);
+        return true;
+    }
+
+    public static double compareBooks(ProcessedBooksResult b1, ProcessedBooksResult b2) {
         return b1.minHashedContent.calcSimTo(b2.minHashedContent);
     }
 
-    public static HashMap<String, ProcessedBooksResult>  getAvailableBooks() {
+    public static HashMap<String, ProcessedBooksResult> getAvailableBooks() {
         return bookStockHashes;
     }
 
@@ -80,6 +95,14 @@ class Interface {
         BookDirectoryProcessor processor = new BookDirectoryProcessor(currentDir, progress, availableBooks);
         processor.start();
         bookStockHashes = processor.result;
+        while (availableBooks == null)
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ie) {
+                ie.printStackTrace();
+            }
+        stock = new CountFilter(availableBooks.getN(), availableBooks.getK());
+
     }
 
     public static void save(File destination) throws IOException {

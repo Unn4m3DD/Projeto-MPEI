@@ -2,7 +2,8 @@ package modules;
 
 import java.io.Serializable;
 
-import static util.Environment.hashSeed;
+import static java.util.Objects.hash;
+
 
 public class CountFilter implements Serializable {
     private int n, k;
@@ -34,9 +35,6 @@ public class CountFilter implements Serializable {
         }
     }
 
-    private int hash(String elem, int i) {
-        return Math.abs(hashSeed.a[i] * (elem).hashCode() + hashSeed.b[i]) % n;
-    }
 
     public boolean isElement(String elem) {
         for (var i = 0; i < k; i++) {
@@ -57,5 +55,11 @@ public class CountFilter implements Serializable {
 
     public int[] getFilter() {
         return filter;
+    }
+
+    public void remElement(String elem) {
+        for (var i = 0; i < k; i++) {
+            filter[hash(elem, i)]--;
+        }
     }
 }
