@@ -1,5 +1,6 @@
 package Threads;
 
+import modules.BloomFilter;
 import util.Book;
 import util.Mutable;
 
@@ -13,25 +14,29 @@ public class FileToBookProcessor extends Thread {
     private File dir;
     private Mutable<Boolean> finished;
     private Mutable<Double> progress;
+    private BloomFilter availableBooks;
 
     public FileToBookProcessor(
             ConcurrentLinkedQueue<Book> toProcessTitle,
             ConcurrentLinkedQueue<Book> toProcessContent,
             File dir,
             Mutable<Boolean> finished,
-            Mutable<Double> progress
+            Mutable<Double> progress,
+            BloomFilter availableBooks
     ) {
         this.toProcessTitle = toProcessTitle;
         this.dir = dir;
         this.finished = finished;
         this.toProcessContent = toProcessContent;
         this.progress = progress;
+        this.availableBooks = availableBooks;
     }
 
     public void run() {
         if (dir.isDirectory())
             try {
                 File[] files = dir.listFiles();
+                availableBooks = new BloomFilter(files.length * 8, BloomFilter.optimalK(files.length * 8, files.length));
                 int pace = (files.length / 100);
                 for (int i = 0; i < files.length; i++) {
                     if (files[i].isFile()) {

@@ -3,6 +3,7 @@ package util;
 import Threads.BookContentProcessor;
 import Threads.BookTitleProcessor;
 import Threads.FileToBookProcessor;
+import modules.BloomFilter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -18,18 +19,19 @@ public class BookDirectoryProcessor extends Thread {
     public HashMap<String, ProcessedBooksResult> result = new HashMap<>();
     private File dir;
     private Mutable<Double> progress;
-
-    public BookDirectoryProcessor(File dir, Mutable<Double> progress) {
+    private BloomFilter availableBooks;
+    public BookDirectoryProcessor(File dir, Mutable<Double> progress, BloomFilter availableBooks) {
         this.dir = dir;
         this.progress = progress;
+        this.availableBooks = availableBooks;
     }
 
     public void run() {
         TimeThis.currentlyTiming = true;
         TimeThis t1 = new TimeThis("Processamento para MinHash e BloomFilter", "e");
         Thread[] threads = new Thread[6];
-        threads[0] = new FileToBookProcessor(toProcessTitle, toProcessContent, dir, finished, progress);
-        threads[1] = new BookTitleProcessor(toProcessTitle, toProcessContent, finished, result);
+        threads[0] = new FileToBookProcessor(toProcessTitle, toProcessContent, dir, finished, progress, availableBooks);
+        threads[1] = new BookTitleProcessor(toProcessTitle, toProcessContent, finished, result, availableBooks);
         threads[2] = new BookContentProcessor(toProcessContent, finished, result);
         threads[3] = new BookContentProcessor(toProcessContent, finished, result);
         threads[4] = new BookContentProcessor(toProcessContent, finished, result);
@@ -59,15 +61,6 @@ public class BookDirectoryProcessor extends Thread {
         t1.end();
         TimeThis.printAllDelays();
 
-    }
-
-    public static void main(String[] args) {
-//        File d = new File("books\\TestBase");
-//        File d = new File("books\\English");
-        File d = new File("books\\Spanish");
-
-        BookDirectoryProcessor bookDirectoryProcessor = new BookDirectoryProcessor(d, new Mutable<>(1.0));
-        compareAll(bookDirectoryProcessor.result);
     }
 
     private static void compareAll(HashMap<String, ProcessedBooksResult> result) {

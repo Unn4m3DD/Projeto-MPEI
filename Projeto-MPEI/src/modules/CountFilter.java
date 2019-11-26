@@ -1,6 +1,10 @@
 package modules;
 
-public class CountFilter {
+import java.io.Serializable;
+
+import static util.Environment.hashSeed;
+
+public class CountFilter implements Serializable {
     private int n, k;
     private int[] filter;
 
@@ -10,67 +14,37 @@ public class CountFilter {
         this.filter = new int[n];
     }
 
-    //para requisitar usar-se-há este método
-    public void addElement(String elem, BloomFilter bloom) {
-        if (bloom.isElement(elem) && ! isElement(elem)){  //verifica se o livro existe na biblioteca e não está requisitado
-            var cond = true;
-            for (var i = 0; i < k; i++) {
-                //a hash usada vai variando segundo a iteração, assim usamos 2 métodos de "hashar" diferentes
-                if (cond)
-                    filter[Math.abs((elem + i).hashCode() % n)] ++;
-                else
-                    filter[string2hash(elem, n, i)] ++;
-                cond = !cond;
-            }
-        }
 
+    public static int optimalK(int n, int m) {
+        return optimalK((long) n, (long) m);
     }
 
-    //para verificar se está requisitado usar-se-há este método
+    private static int optimalK(long n, long m) {
+        int optK = (int) Math.round(n * 0.693 / m);
+        return optK == 0 ? 1 : optK;
+    }
+
+    public double probErr(int numElem) {
+        return Math.pow(1 - Math.pow(1 - (double) 1 / n, k * numElem), k);
+    }
+
+    public void addElement(String elem) {
+        for (var i = 0; i < k; i++) {
+            filter[hash(elem, i)]++;
+        }
+    }
+
+    private int hash(String elem, int i) {
+        return Math.abs(hashSeed.a[i] * (elem).hashCode() + hashSeed.b[i]) % n;
+    }
+
     public boolean isElement(String elem) {
-        var cond = true;
         for (var i = 0; i < k; i++) {
-            if (cond && filter[Math.abs((elem + i).hashCode() % n)] == 0) {
-                return false;
-            } else if (!cond && filter[string2hash(elem, n, i)] == 0) {
+            if (filter[hash(elem, i)] == 0) {
                 return false;
             }
-            cond = !cond;
         }
         return true;
-    }
-
-
-    public boolean returnBook(String elem, BloomFilter bloom){  //returns true if it was returned, returns false if wasn't
-        if (! isElement(elem)) {
-            System.out.println("Book was not taken from the library");
-            return false;
-        }
-        if (! bloom.isElement(elem)) {
-            System.out.println("Book doesn't exist in the library");
-            return false;
-        }
-        var cond = true;
-        for (var i = 0; i < k; i++) {
-            //código do método addElement() mas em vez de incrementar decrementa
-            if (cond)
-                filter[Math.abs((elem + i).hashCode() % n)] --;
-            else
-                filter[string2hash(elem, n, i)] --;
-            cond = !cond;
-        }
-        return true;
-
-    }
-
-    private int string2hash(String s, int mod, int seed) {
-        long result = (long) Math.pow(seed, seed * 3);
-        char[] ca = s.toCharArray();
-        for (var c : ca) {
-            result = result * 31 + c;
-        }
-        result = Math.abs(result);
-        return (int) (result % mod);
     }
 
     public int getN() {

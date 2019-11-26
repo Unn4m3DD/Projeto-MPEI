@@ -1,5 +1,6 @@
 package Threads;
 
+import modules.BloomFilter;
 import modules.MinHash;
 import util.Book;
 import util.Mutable;
@@ -15,17 +16,19 @@ public class BookTitleProcessor extends Thread {
     private ConcurrentLinkedQueue<Book> toProcessContent;
     private HashMap<String, ProcessedBooksResult> result;
     private Mutable<Boolean> finished;
-
+    private BloomFilter availableBooks;
     public BookTitleProcessor(
             ConcurrentLinkedQueue<Book> toProcessTitle,
             ConcurrentLinkedQueue<Book> toProcessContent,
             Mutable<Boolean> finished,
-            HashMap<String, ProcessedBooksResult> result
+            HashMap<String, ProcessedBooksResult> result,
+            BloomFilter availableBooks
     ) {
         this.toProcessTitle = toProcessTitle;
         this.finished = finished;
         this.result = result;
         this.toProcessContent = toProcessContent;
+        this.availableBooks = availableBooks;
     }
 
     public void run() {
@@ -39,7 +42,7 @@ public class BookTitleProcessor extends Thread {
                 for (var c : b.getTitle()) {
                     sb.append(c);
                 }
-                ProcessedBooksResult.titlesBloomFilter.addElement(sb.toString().trim());
+                availableBooks.addElement(sb.toString().trim());
 
 //                if (!result.containsKey(b.getName())) {
                 ProcessedBooksResult innerResult = new ProcessedBooksResult();
