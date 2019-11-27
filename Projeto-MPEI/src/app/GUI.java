@@ -12,6 +12,8 @@ package app;
 import util.Mutable;
 
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 import static app.Interface.parseDirectory;
@@ -274,7 +276,7 @@ class GUI {
         textPanel.setPreferredSize(new Dimension(400,50));
         p.add(textPanel, BorderLayout.NORTH);
 
-        //textfield -> arranjar maneira de ter isto melhor!!
+        //textfield
         JTextField title = new JTextField();
         JPanel insertPanel= new JPanel();
         insertPanel.setPreferredSize(new Dimension(310, 30));
@@ -305,13 +307,43 @@ class GUI {
 
     private static void findSimilarTitle(String book) {
         JFrame window = new JFrame();
-        window.setLayout(new FlowLayout());
+        window.setLayout(new GridLayout(1,2));
+
         //title sort of
         JLabel text = new JLabel("Similar titles found");
-        text.setSize(new Dimension(500,100));
+        text.setFont(new Font("Arial", Font.BOLD, 25));
         window.add(text);
 
-        //file thingy
+        //button
+        var okay = new JButton();
+        okay.setText("OK");
+        okay.addActionListener((e)-> {
+            //return true; <- break
+        });
+        window.add(okay);
+
+        //CLUSTER OF LEFT
+        var left = new JPanel(new GridLayout(2,1));
+        var textP = new JPanel();
+        textP.add(text, BorderLayout.CENTER); //<- DOESN'T WORK WHYYYY PLEASE HELP
+        textP.setSize(250,100);
+        left.add(textP);
+        var okayP = new JPanel();
+        okayP.add(okay, BorderLayout.CENTER);
+        left.add(okayP);
+        window.add(left);
+
+        //file thingy (CLUSTER OF RIGHT)
+        var right = new JPanel(new BorderLayout());
+        var files = new JTextArea();
+        var listScrollPane = new JScrollPane(files);
+        listScrollPane.setMinimumSize(new Dimension(100,300));
+        files.setText("a \n a a a \n bbb");
+        right.add(files, BorderLayout.CENTER);
+        right.add(listScrollPane, BorderLayout.EAST); //<- THE SCROLL WONT SHOW THE FUCK UP HELP
+        right.setBorder(new EmptyBorder(10,10,10,10));
+        right.add(listScrollPane, BorderLayout.EAST);
+        window.add(right);
 
 
         //JFrame settings
