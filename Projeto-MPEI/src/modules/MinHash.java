@@ -22,13 +22,12 @@ public class MinHash implements Serializable {
         for (var i = 0; i < hashSeed.size; i++) {
             int min = Integer.MAX_VALUE;
             for (var item : set) {
-                int c_hash = hash(item,i);
+                int c_hash = hash(item, i);
                 if (c_hash < min) min = c_hash;
             }
             signature[i] = min;
         }
         t.end();
-
     }
 
 
@@ -57,6 +56,9 @@ public class MinHash implements Serializable {
         return result;
     }
 
+    public int[] getSignature() {
+        return signature;
+    }
 }
 
 

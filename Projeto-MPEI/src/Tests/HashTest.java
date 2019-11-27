@@ -35,7 +35,6 @@ public class HashTest {
                 for (int j = 0; j < numOfHashes; j++) {
                     hashes[i].add(hash(ns[i], j));
                 }
-
             }
             double err = 0;
             for (int i = 0; i < ns.length; i++) {
