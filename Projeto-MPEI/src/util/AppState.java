@@ -3,9 +3,10 @@ package util;
 import modules.BloomFilter;
 import modules.CountFilter;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
-public class AppState {
+public class AppState implements Serializable {
     private HashMap<String, ProcessedBooksResult> bookStockHashes;
     private BloomFilter availableBooks;
     private CountFilter stock;
