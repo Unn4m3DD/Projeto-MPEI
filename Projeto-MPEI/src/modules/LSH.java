@@ -6,7 +6,7 @@ public class LSH {
     int[] fingerPrint;
     int numberOfGroups, numberOfElements;
 
-    LSH(MinHash minHash, int numberOfGroups) {
+    public LSH(MinHash minHash, int numberOfGroups) {
         int numberOfElements = minHash.getSignature().length / numberOfGroups;
         if (minHash.getSignature().length % numberOfElements != 0) numberOfGroups++;
         fingerPrint = new int[numberOfGroups];

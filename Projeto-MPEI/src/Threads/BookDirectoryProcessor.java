@@ -10,6 +10,7 @@ import util.ProcessedBooksResult;
 import util.TimeThis;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -23,7 +24,7 @@ public class BookDirectoryProcessor extends Thread {
     public HashMap<String, ProcessedBooksResult> result = new HashMap<>();
     private File dir;
     private Mutable<Double> progress;
-    private BloomFilter availableBooks;
+    private BloomFilter availableBooks ;
     public BookDirectoryProcessor(File dir, Mutable<Double> progress, BloomFilter availableBooks) {
         this.dir = dir;
         this.progress = progress;
@@ -35,6 +36,11 @@ public class BookDirectoryProcessor extends Thread {
         TimeThis t1 = new TimeThis("Processamento para MinHash e BloomFilter", "e");
         Thread[] threads = new Thread[6];
         threads[0] = new FileToBookProcessor(toProcessTitle, toProcessContent, dir, finished, progress, availableBooks);
+        try{
+            Thread.sleep(50);
+        }catch (InterruptedException ie){
+            ie.printStackTrace();
+        }
         threads[1] = new BookTitleProcessor(toProcessTitle, toProcessContent, finished, result, availableBooks);
         threads[2] = new BookContentProcessor(toProcessContent, finished, result);
         threads[3] = new BookContentProcessor(toProcessContent, finished, result);
