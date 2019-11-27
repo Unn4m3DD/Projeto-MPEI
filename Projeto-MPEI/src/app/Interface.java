@@ -3,6 +3,7 @@ package app;
 import Threads.BookDirectoryProcessor;
 import modules.BloomFilter;
 import modules.CountFilter;
+import modules.LSH;
 import modules.MinHash;
 import util.*;
 
@@ -18,7 +19,7 @@ class Interface {
     private static HashMap<String, ProcessedBooksResult> bookStockHashes = new HashMap<>();
     public static BloomFilter availableBooks;
     public static CountFilter stock;
-
+    public static HashMap<String, LSH> bookStockFingerprints = new HashMap<>();
     public static File setCurrentDirectory() {
         return currentDir;
     }
@@ -50,6 +51,9 @@ class Interface {
         return availableBooks.isElement(name);
     }
 
+//    public static HashMap<String, List<ProcessedBooksResult>> allSim(double thr){
+//        bookStockFingerprints.put(new LSH(bookStockHashes.get(), ))
+//    }
 
     public static List<ProcessedBooksResult> searchBook(String name, double thr) {
         ArrayList<ProcessedBooksResult> result = new ArrayList<>();

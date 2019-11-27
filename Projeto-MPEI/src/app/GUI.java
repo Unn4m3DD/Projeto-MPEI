@@ -267,30 +267,35 @@ class GUI {
         JLabel text = new JLabel();
         text.setText("Insert title to search");
         JPanel textPanel = new JPanel();
-        textPanel.add(text);
-        textPanel.setSize(new Dimension(500,100));
+        textPanel.setLayout(new BorderLayout());
+        text.setFont(new Font("Arial", Font.BOLD, 25));
+        text.setHorizontalAlignment(0);
+        textPanel.add(text, BorderLayout.CENTER);
+        textPanel.setPreferredSize(new Dimension(400,50));
         p.add(textPanel, BorderLayout.NORTH);
 
         //textfield -> arranjar maneira de ter isto melhor!!
         JTextField title = new JTextField();
-        title.setPreferredSize(new Dimension(500,100));
         JPanel insertPanel= new JPanel();
+        insertPanel.setPreferredSize(new Dimension(310, 30));
+        title.setPreferredSize(new Dimension(300,25));
         insertPanel.add(title);
-        insertPanel.setPreferredSize(new Dimension(500,100));
         p.add(insertPanel, BorderLayout.CENTER);
 
         //button
+        JPanel searchPanel = new JPanel();
         JButton search = new JButton();
         search.setText("Search");
         search.addActionListener((e)->{
             String book=title.getText();
             findSimilarTitle(book);
         });
-        search.setSize(new Dimension(300,100));
-        p.add(search, BorderLayout.SOUTH);
+        search.setPreferredSize(new Dimension(150,25));
+        searchPanel.add(search);
+        p.add(searchPanel, BorderLayout.SOUTH);
 
 
-        p.setSize(500,300);
+        p.setSize(400,150);
         int x = (screenSize.width - p.getWidth()) / 2;
         int y = (screenSize.height - p.getHeight()) / 2;
         p.setLocation(x,y);
