@@ -261,26 +261,25 @@ class GUI {
 
     private static void searchTitle() {
         JFrame p = new JFrame();
-        p.setLayout(new FlowLayout());
+        p.setLayout(new BorderLayout());
 
         //header
         JLabel text = new JLabel();
         text.setText("Insert title to search");
         JPanel textPanel = new JPanel();
         textPanel.add(text);
-        textPanel.setPreferredSize(new Dimension(500,100));
-        textPanel.setLocation(p.getWidth(), p.getHeight()/3);// <- DOESN'T WORK
-        p.add(textPanel);
+        textPanel.setSize(new Dimension(500,100));
+        p.add(textPanel, BorderLayout.NORTH);
 
-        //textfield
+        //textfield -> arranjar maneira de ter isto melhor!!
         JTextField title = new JTextField();
-        title.setPreferredSize(new Dimension(300,100));
+        title.setPreferredSize(new Dimension(500,100));
         JPanel insertPanel= new JPanel();
         insertPanel.add(title);
-        insertPanel.setSize(new Dimension(300,100));
-        insertPanel.setLocation(p.getWidth(), p.getHeight()*2/3);
-        p.add(insertPanel);
+        insertPanel.setPreferredSize(new Dimension(500,100));
+        p.add(insertPanel, BorderLayout.CENTER);
 
+        //button
         JButton search = new JButton();
         search.setText("Search");
         search.addActionListener((e)->{
@@ -288,10 +287,7 @@ class GUI {
             findSimilarTitle(book);
         });
         search.setSize(new Dimension(300,100));
-        p.add(search);
-        search.addActionListener((e)-> {
-
-        });
+        p.add(search, BorderLayout.SOUTH);
 
 
         p.setSize(500,300);
@@ -362,3 +358,4 @@ class GUI {
 
     }
 }
+
