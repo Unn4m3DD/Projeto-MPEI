@@ -9,12 +9,17 @@ TODO 22/11/2019
 
 package app;
 
+import util.AppState;
 import util.Mutable;
+import util.ProcessedBooksResult;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.util.HashMap;
 
 import static app.Interface.parseDirectory;
 
@@ -40,7 +45,7 @@ class GUI {
         final JPanel panel1 = new JPanel();
         panel1.setLayout(new GridBagLayout());
         searchTitle = new JButton();
-        searchTitle.addActionListener((e)->{
+        searchTitle.addActionListener((e) -> {
             /* TODO
                 serch title
              */
@@ -189,7 +194,7 @@ class GUI {
            TODO
             >implement Open directory
          */
-        a.addActionListener((e)-> {
+        a.addActionListener((e) -> {
             System.out.println("Clicked open directory");
         });
         file.add(a);
@@ -233,12 +238,12 @@ class GUI {
             System.out.println("Clicked Jaccard index");
         });
         tools.add(a);
-        a= new JMenuItem("Download data set");
-        a.addActionListener((e)->{
+        a = new JMenuItem("Download data set");
+        a.addActionListener((e) -> {
             /* TODO
-            *   >download data set (input será o número aproximado de livros)
-            *   >com loading bar!!
-            * */
+             *   >download data set (input será o número aproximado de livros)
+             *   >com loading bar!!
+             * */
             System.out.println("Clicked Download Data set");
         });
         tools.add(a);
@@ -248,7 +253,7 @@ class GUI {
         menus.add(tools);
 
         JFrame out = new JFrame("Library Management");
-        Dimension windowSize = new Dimension(1000,600);
+        Dimension windowSize = new Dimension(1000, 600);
         out.add(panel1);
         out.setSize(windowSize);
         out.setVisible(true);
@@ -256,7 +261,7 @@ class GUI {
         out.setResizable(false);
         int x = (screenSize.width - out.getWidth()) / 2;
         int y = (screenSize.height - out.getHeight()) / 2;
-        out.setLocation(x,y);
+        out.setLocation(x, y);
         out.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
     }
@@ -273,14 +278,14 @@ class GUI {
         text.setFont(new Font("Arial", Font.BOLD, 25));
         text.setHorizontalAlignment(0);
         textPanel.add(text, BorderLayout.CENTER);
-        textPanel.setPreferredSize(new Dimension(400,50));
+        textPanel.setPreferredSize(new Dimension(400, 50));
         p.add(textPanel, BorderLayout.NORTH);
 
         //textfield
         JTextField title = new JTextField();
-        JPanel insertPanel= new JPanel();
+        JPanel insertPanel = new JPanel();
         insertPanel.setPreferredSize(new Dimension(310, 30));
-        title.setPreferredSize(new Dimension(300,25));
+        title.setPreferredSize(new Dimension(300, 25));
         insertPanel.add(title);
         p.add(insertPanel, BorderLayout.CENTER);
 
@@ -288,45 +293,42 @@ class GUI {
         JPanel searchPanel = new JPanel();
         JButton search = new JButton();
         search.setText("Search");
-        search.addActionListener((e)->{
-            String book=title.getText();
+        search.addActionListener((e) -> {
+            String book = title.getText();
             findSimilarTitle(book);
         });
-        search.setPreferredSize(new Dimension(150,25));
+        search.setPreferredSize(new Dimension(150, 25));
         searchPanel.add(search);
         p.add(searchPanel, BorderLayout.SOUTH);
 
 
-        p.setSize(400,150);
+        p.setSize(400, 150);
         int x = (screenSize.width - p.getWidth()) / 2;
         int y = (screenSize.height - p.getHeight()) / 2;
-        p.setLocation(x,y);
+        p.setLocation(x, y);
         p.setVisible(true);
         p.setResizable(false);
     }
 
     private static void findSimilarTitle(String book) {
         JFrame window = new JFrame();
-        window.setLayout(new GridLayout(1,2));
+        window.setLayout(new GridLayout(1, 2));
 
         //title sort of
         JLabel text = new JLabel("Similar titles found");
         text.setFont(new Font("Arial", Font.BOLD, 25));
-        window.add(text);
 
         //button
         var okay = new JButton();
         okay.setText("OK");
-        okay.addActionListener((e)-> {
-            //return true; <- break
+        okay.addActionListener((e) -> {
+            window.dispose();
         });
-        window.add(okay);
 
         //CLUSTER OF LEFT
-        var left = new JPanel(new GridLayout(2,1));
-        var textP = new JPanel();
-        textP.add(text, BorderLayout.CENTER); //<- DOESN'T WORK WHYYYY PLEASE HELP
-        textP.setSize(250,100);
+        var left = new JPanel(new GridLayout(2, 1));
+        var textP = new JPanel(new GridBagLayout());
+        textP.add(text);
         left.add(textP);
         var okayP = new JPanel();
         okayP.add(okay, BorderLayout.CENTER);
@@ -334,23 +336,26 @@ class GUI {
         window.add(left);
 
         //file thingy (CLUSTER OF RIGHT)
-        var right = new JPanel(new BorderLayout());
-        var files = new JTextArea();
-        var listScrollPane = new JScrollPane(files);
-        listScrollPane.setMinimumSize(new Dimension(100,300));
-        files.setText("a \n a a a \n bbb");
-        right.add(files, BorderLayout.CENTER);
-        right.add(listScrollPane, BorderLayout.EAST); //<- THE SCROLL WONT SHOW THE FUCK UP HELP
-        right.setBorder(new EmptyBorder(10,10,10,10));
-        right.add(listScrollPane, BorderLayout.EAST);
-        window.add(right);
-
+        JPanel rightPanel = new JPanel();
+        JTextArea display = new JTextArea();
+        String equalBooks = "";
+        var equal = Interface.searchBook(book, 0.9); //<- parametrizar este valor??
+        for (int i = 0; i < equal.size(); i++) {
+            equalBooks = equalBooks + equal.get(i) + "\n";
+        }
+        display.setText(equalBooks);
+        display.setPreferredSize(new Dimension(200, 250));
+        display.setEditable(false);
+        JScrollPane scroll = new JScrollPane(display);
+        scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        rightPanel.add(scroll);
+        window.add(rightPanel);
 
         //JFrame settings
-        window.setSize(500,300);
+        window.setSize(500, 300);
         int x = (screenSize.width - window.getWidth()) / 2;
         int y = (screenSize.height - window.getHeight()) / 2;
-        window.setLocation(x,y);
+        window.setLocation(x, y);
         window.setVisible(true);
         window.setResizable(false);
     }
@@ -365,7 +370,7 @@ class GUI {
         p.add(pr);
         p.add(b);
         JFrame j = new JFrame();
-        j.setSize(400,100);
+        j.setSize(400, 100);
         j.add(p);
         j.setVisible(true);
         final SwingWorker w = new SwingWorker() {
@@ -381,7 +386,7 @@ class GUI {
                     } catch (InterruptedException ex) {
                         ex.printStackTrace();
                     }
-                }while (!progress.get().equals(1.0));
+                } while (!progress.get().equals(1.0));
                 pr.setValue((int) (100));
                 j.repaint();
                 pr.setString((int) (100) + "%");
