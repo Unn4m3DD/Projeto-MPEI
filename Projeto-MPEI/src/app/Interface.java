@@ -10,6 +10,7 @@ import util.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import static util.Environment.titleShingleSize;
@@ -17,9 +18,10 @@ import static util.Environment.titleShingleSize;
 class Interface {
     private static File currentDir = new File("books" + File.separator + "Spanish");
     private static HashMap<String, ProcessedBooksResult> bookStockHashes = new HashMap<>();
-    public static BloomFilter availableBooks;
+    public static BloomFilter availableBooks = new BloomFilter();
     public static CountFilter stock;
     public static HashMap<String, LSH> bookStockFingerprints = new HashMap<>();
+
     public static File setCurrentDirectory() {
         return currentDir;
     }
@@ -31,29 +33,49 @@ class Interface {
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
-        Mutable<Double> prog = new Mutable<>(0.0);
-        parseDirectory(prog);
-        while (!prog.get().equals(1.0))
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ie) {
-                ie.printStackTrace();
-            }
-        save(new File("savetest.ser"));
+//        Mutable<Double> prog = new Mutable<>(0.0);
+//        parseDirectory(prog);
+//        while (!prog.get().equals(1.0))
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException ie) {
+//                ie.printStackTrace();
+//            }
+//        save(new File("savetest.ser"));
         load(new File("savetest.ser"));
         System.out.println(searchBook("Merodeadores ", .1));
         System.out.println(bookStockHashes);
         System.out.println(checkBook("Los majos de Cádiz"));
         System.out.println(checkBook("Los pescadores de Trépang"));
+        System.out.println(allSim());
+
     }
 
     public static boolean checkBook(String name) {
         return availableBooks.isElement(name);
     }
 
-//    public static HashMap<String, List<ProcessedBooksResult>> allSim(double thr){
-//        bookStockFingerprints.put(new LSH(bookStockHashes.get(), ))
-//    }
+    private static void generateFingerprint() {
+        for (var key : bookStockHashes.keySet()) {
+            bookStockFingerprints.put(key, new LSH(bookStockHashes.get(key).minHashedContent, 4));
+        }
+    }
+
+    public static HashMap<ProcessedBooksResult, List<ProcessedBooksResult>> allSim() {
+        // TODO: 27/11/2019 Refazer isto pq está só estupido 
+        
+//        generateFingerprint();
+//        HashMap<ProcessedBooksResult, List<ProcessedBooksResult>> result = new HashMap<>();
+//        for (var key1 : bookStockFingerprints.keySet()) {
+//            result.put(bookStockHashes.get(key1), new LinkedList<>());
+//            for (var key2 : bookStockFingerprints.keySet()) {
+//                if (0.5 < bookStockHashes.get(key1).minHashedContent.calcSimTo(bookStockHashes.get(key2).minHashedContent) && (!key1.equals(key2))){
+//                    result.get(bookStockHashes.get(key1)).add(bookStockHashes.get(key2));
+//                }
+//            }
+//        }
+//        return result;
+    }
 
     public static List<ProcessedBooksResult> searchBook(String name, double thr) {
         ArrayList<ProcessedBooksResult> result = new ArrayList<>();
@@ -74,15 +96,16 @@ class Interface {
         return result;
     }
 
-    public static boolean requestBook(String name){
-        if(!availableBooks.isElement(name)) return false;
-        if(stock.isElement(name)) return  false;
+    public static boolean requestBook(String name) {
+        if (!availableBooks.isElement(name)) return false;
+        if (stock.isElement(name)) return false;
         stock.addElement(name);
         return true;
     }
-    public static boolean returnBook(String name){
-        if(!availableBooks.isElement(name)) return false;
-        if(!stock.isElement(name)) return  false;
+
+    public static boolean returnBook(String name) {
+        if (!availableBooks.isElement(name)) return false;
+        if (!stock.isElement(name)) return false;
         stock.remElement(name);
         return true;
     }

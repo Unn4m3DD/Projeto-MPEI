@@ -36,7 +36,7 @@ public class FileToBookProcessor extends Thread {
         if (dir.isDirectory())
             try {
                 File[] files = dir.listFiles();
-                availableBooks = new BloomFilter(files.length * 8, BloomFilter.optimalK(files.length * 8, files.length));
+                availableBooks.setParams(files.length * 8, BloomFilter.optimalK(files.length * 8, files.length));
                 int pace = (files.length / 100);
                 for (int i = 0; i < files.length; i++) {
                     if (files[i].isFile()) {
