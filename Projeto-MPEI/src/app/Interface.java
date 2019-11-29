@@ -47,7 +47,7 @@ class Interface {
         System.out.println(bookStockHashes);
         System.out.println(checkBook("Los majos de Cádiz"));
         System.out.println(checkBook("Los pescadores de Trépang"));
-        System.out.println(allSim());
+        //System.out.println(allSim());
 
     }
 
@@ -61,7 +61,7 @@ class Interface {
         }
     }
 
-    public static HashMap<ProcessedBooksResult, List<ProcessedBooksResult>> allSim() {
+    /*public static  HashMap<ProcessedBooksResult, List<ProcessedBooksResult>> allSim() {
         // TODO: 27/11/2019 Refazer isto pq está só estupido 
         
 //        generateFingerprint();
@@ -75,7 +75,7 @@ class Interface {
 //            }
 //        }
 //        return result;
-    }
+    }*/
 
     public static List<ProcessedBooksResult> searchBook(String name, double thr) {
         ArrayList<ProcessedBooksResult> result = new ArrayList<>();

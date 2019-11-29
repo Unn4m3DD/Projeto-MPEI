@@ -9,17 +9,10 @@ TODO 22/11/2019
 
 package app;
 
-import util.AppState;
 import util.Mutable;
-import util.ProcessedBooksResult;
 
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
-import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.util.HashMap;
 
 import static app.Interface.parseDirectory;
 
@@ -33,10 +26,10 @@ class GUI {
         JButton compare2Books;
         JButton similarContent;
         JButton parseDirectory;
-        JButton searchTitle;
-        JButton checkTitle;
-        JButton requestBook;
-        JButton returnBook;
+        JButton searchTitle; //TODO check if its working AKA showing the actual book names
+        JButton checkTitle;  //TODO check if tis working aka showing if the book is or is not a part of the inventory
+        JButton requestBook; //TODO check if its working aka showing book request and seeing if it actually requested
+        JButton returnBook;  //TODO check if its working AKA showing the book was returned and it being actually returned
         JButton similarTitle;
         JButton availability;
         JMenu file;
@@ -46,9 +39,6 @@ class GUI {
         panel1.setLayout(new GridBagLayout());
         searchTitle = new JButton();
         searchTitle.addActionListener((e) -> {
-            /* TODO
-                serch title
-             */
             searchTitle();
         });
         searchTitle.setPreferredSize(dim);
@@ -69,6 +59,9 @@ class GUI {
         checkTitle = new JButton();
         checkTitle.setText("Check title");
         checkTitle.setPreferredSize(dim);
+        checkTitle.addActionListener((e) -> {
+            checkTitle();
+        });
         button = new JPanel();
         button.setSize(dim);
         button.add(checkTitle);
@@ -83,6 +76,9 @@ class GUI {
 
         requestBook = new JButton();
         requestBook.setText("Request book");
+        requestBook.addActionListener((e) -> {
+            requestBook();
+        });
         requestBook.setPreferredSize(dim);
         button = new JPanel();
         button.setSize(dim);
@@ -97,6 +93,9 @@ class GUI {
 
         returnBook = new JButton();
         returnBook.setText("Return book");
+        returnBook.addActionListener((e) -> {
+            returnBook();
+        });
         returnBook.setPreferredSize(dim);
         button = new JPanel();
         button.setSize(dim);
@@ -263,6 +262,256 @@ class GUI {
         int y = (screenSize.height - out.getHeight()) / 2;
         out.setLocation(x, y);
         out.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+    }
+
+    private static void returnBook() {
+        JFrame p = new JFrame();
+        p.setLayout(new BorderLayout());
+
+        //header
+        JLabel text = new JLabel();
+        text.setText("Insert book name");
+        JPanel textPanel = new JPanel();
+        textPanel.setLayout(new BorderLayout());
+        text.setFont(new Font("Arial", Font.BOLD, 25));
+        text.setHorizontalAlignment(0);
+        textPanel.add(text, BorderLayout.CENTER);
+        textPanel.setPreferredSize(new Dimension(400, 50));
+        p.add(textPanel, BorderLayout.NORTH);
+
+        //textfield
+        JTextField title = new JTextField();
+        JPanel insertPanel = new JPanel();
+        insertPanel.setPreferredSize(new Dimension(310, 30));
+        title.setPreferredSize(new Dimension(300, 25));
+        insertPanel.add(title);
+        p.add(insertPanel, BorderLayout.CENTER);
+
+        //button
+        JPanel searchPanel = new JPanel();
+        JButton search = new JButton();
+        search.setText("Return");
+        search.addActionListener((e) -> {
+            String book = title.getText();
+            returnedBook(book);
+        });
+        search.setPreferredSize(new Dimension(150, 25));
+        searchPanel.add(search);
+        p.add(searchPanel, BorderLayout.SOUTH);
+
+
+        p.setSize(400, 150);
+        int x = (screenSize.width - p.getWidth()) / 2;
+        int y = (screenSize.height - p.getHeight()) / 2;
+        p.setLocation(x, y);
+        p.setVisible(true);
+        p.setResizable(false);
+    }
+
+    private static void returnedBook(String book) {
+        String s = "";
+        if (Interface.returnBook(book))
+            s = "Book returned";
+        else
+            s = "Book not returned";
+        JFrame window = new JFrame();
+        window.setLayout(new GridLayout(1, 2));
+
+        //title sort of
+        JLabel text = new JLabel(s);
+        text.setFont(new Font("Arial", Font.BOLD, 25));
+        text.setText(s);
+
+        //button
+        var okay = new JButton();
+        okay.setText("OK");
+        okay.addActionListener((e) -> {
+            window.dispose();
+        });
+
+        //CLUSTER OF LEFT
+        var left = new JPanel(new GridLayout(2, 1));
+        var textP = new JPanel(new GridBagLayout());
+        textP.add(text);
+        left.add(textP);
+        var okayP = new JPanel();
+        okayP.add(okay, BorderLayout.CENTER);
+        left.add(okayP);
+        window.add(left);
+        window.setSize(500, 300);
+        int x = (screenSize.width - window.getWidth()) / 2;
+        int y = (screenSize.height - window.getHeight()) / 2;
+        window.setLocation(x, y);
+        window.setVisible(true);
+        window.setResizable(false);
+    }
+
+    private static void requestBook() {
+        JFrame p = new JFrame();
+        p.setLayout(new BorderLayout());
+
+        //header
+        JLabel text = new JLabel();
+        text.setText("Insert book name");
+        JPanel textPanel = new JPanel();
+        textPanel.setLayout(new BorderLayout());
+        text.setFont(new Font("Arial", Font.BOLD, 25));
+        text.setHorizontalAlignment(0);
+        textPanel.add(text, BorderLayout.CENTER);
+        textPanel.setPreferredSize(new Dimension(400, 50));
+        p.add(textPanel, BorderLayout.NORTH);
+
+        //textfield
+        JTextField title = new JTextField();
+        JPanel insertPanel = new JPanel();
+        insertPanel.setPreferredSize(new Dimension(310, 30));
+        title.setPreferredSize(new Dimension(300, 25));
+        insertPanel.add(title);
+        p.add(insertPanel, BorderLayout.CENTER);
+
+        //button
+        JPanel searchPanel = new JPanel();
+        JButton search = new JButton();
+        search.setText("Request");
+        search.addActionListener((e) -> {
+            String book = title.getText();
+            bookRequested(book);
+        });
+        search.setPreferredSize(new Dimension(150, 25));
+        searchPanel.add(search);
+        p.add(searchPanel, BorderLayout.SOUTH);
+
+
+        p.setSize(400, 150);
+        int x = (screenSize.width - p.getWidth()) / 2;
+        int y = (screenSize.height - p.getHeight()) / 2;
+        p.setLocation(x, y);
+        p.setVisible(true);
+        p.setResizable(false);
+
+    }
+
+    private static void bookRequested(String book) {
+        String s = "";
+        if (Interface.requestBook(book))
+            s = "Book requested";
+        else
+            s = "Book not requested";
+        JFrame window = new JFrame();
+        window.setLayout(new GridLayout(1, 2));
+
+        //title sort of
+        JLabel text = new JLabel(s);
+        text.setFont(new Font("Arial", Font.BOLD, 25));
+        text.setText(s);
+
+        //button
+        var okay = new JButton();
+        okay.setText("OK");
+        okay.addActionListener((e) -> {
+            window.dispose();
+        });
+
+        //CLUSTER OF LEFT
+        var left = new JPanel(new GridLayout(2, 1));
+        var textP = new JPanel(new GridBagLayout());
+        textP.add(text);
+        left.add(textP);
+        var okayP = new JPanel();
+        okayP.add(okay, BorderLayout.CENTER);
+        left.add(okayP);
+        window.add(left);
+        window.setSize(500, 300);
+        int x = (screenSize.width - window.getWidth()) / 2;
+        int y = (screenSize.height - window.getHeight()) / 2;
+        window.setLocation(x, y);
+        window.setVisible(true);
+        window.setResizable(false);
+    }
+
+    private static void checkTitle() {
+        JFrame p = new JFrame();
+        p.setLayout(new BorderLayout());
+
+        //header
+        JLabel text = new JLabel();
+        text.setText("Insert title to check");
+        JPanel textPanel = new JPanel();
+        textPanel.setLayout(new BorderLayout());
+        text.setFont(new Font("Arial", Font.BOLD, 25));
+        text.setHorizontalAlignment(0);
+        textPanel.add(text, BorderLayout.CENTER);
+        textPanel.setPreferredSize(new Dimension(400, 50));
+        p.add(textPanel, BorderLayout.NORTH);
+
+        //textfield
+        JTextField title = new JTextField();
+        JPanel insertPanel = new JPanel();
+        insertPanel.setPreferredSize(new Dimension(310, 30));
+        title.setPreferredSize(new Dimension(300, 25));
+        insertPanel.add(title);
+        p.add(insertPanel, BorderLayout.CENTER);
+
+        //button
+        JPanel searchPanel = new JPanel();
+        JButton search = new JButton();
+        search.setText("Check");
+        search.addActionListener((e) -> {
+            String book = title.getText();
+            bookFound(book);
+        });
+        search.setPreferredSize(new Dimension(150, 25));
+        searchPanel.add(search);
+        p.add(searchPanel, BorderLayout.SOUTH);
+
+
+        p.setSize(400, 150);
+        int x = (screenSize.width - p.getWidth()) / 2;
+        int y = (screenSize.height - p.getHeight()) / 2;
+        p.setLocation(x, y);
+        p.setVisible(true);
+        p.setResizable(false);
+
+    }
+
+    private static void bookFound(String book) {
+        //basically a copy of similar title
+        String s = "";
+        if (Interface.checkBook(book))
+            s = "Book found";
+        else
+            s = "Book not found";
+        JFrame window = new JFrame();
+        window.setLayout(new GridLayout(1, 2));
+
+        //title sort of
+        JLabel text = new JLabel(s);
+        text.setFont(new Font("Arial", Font.BOLD, 25));
+        text.setText(s);
+
+        //button
+        var okay = new JButton();
+        okay.setText("OK");
+        okay.addActionListener((e) -> {
+            window.dispose();
+        });
+
+        //CLUSTER OF LEFT
+        var left = new JPanel(new GridLayout(2, 1));
+        var textP = new JPanel(new GridBagLayout());
+        textP.add(text);
+        left.add(textP);
+        var okayP = new JPanel();
+        okayP.add(okay, BorderLayout.CENTER);
+        left.add(okayP);
+        window.add(left);
+        window.setSize(500, 300);
+        int x = (screenSize.width - window.getWidth()) / 2;
+        int y = (screenSize.height - window.getHeight()) / 2;
+        window.setLocation(x, y);
+        window.setVisible(true);
+        window.setResizable(false);
 
     }
 
