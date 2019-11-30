@@ -47,6 +47,7 @@ class BloomFilterTest {
     private static double falsePositiveTest(BloomFilter b) {
         int count = 0;
         for (var i = 0; i < 10000; i++) {
+            boolean a = b.isElement(randomString());
             if (b.isElement(randomString())) count++;
         }
 
