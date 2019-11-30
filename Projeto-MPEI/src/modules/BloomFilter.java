@@ -46,7 +46,7 @@ public class BloomFilter implements Serializable {
         } catch (Exception e) {
             System.out.println("Runtime Error: " + e.toString());
         }
-        var b = new BloomFilter(wordSet.size() * 4, BloomFilter.optimalK(wordSet.size() * 8, wordSet.size()));
+        var b = new BloomFilter(wordSet.size() * 4, BloomFilter.optimalK(wordSet.size() * 4, wordSet.size()));
         for (var elem : wordSet) {
             b.addElement(elem);
         }

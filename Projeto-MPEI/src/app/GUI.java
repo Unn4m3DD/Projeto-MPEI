@@ -11,6 +11,7 @@ package app;
 
 import util.Book;
 import util.Mutable;
+import util.ProcessedBooksResult;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
@@ -93,7 +94,7 @@ class GUI extends JFrame implements ActionListener {
         if (e.getSource().equals(buttons.get("Check book Availability")))
             assert true;
         if (e.getSource().equals(buttons.get("All Similar Content")))
-            assert true;
+            allSimilarContent();
         if (e.getSource().equals(buttons.get("Compare 2 Books")))
             assert true;
         if (e.getSource().equals(menuItems.get("Parse Directory")))
@@ -103,6 +104,7 @@ class GUI extends JFrame implements ActionListener {
         if (e.getSource().equals(menuItems.get("Load Library")))
             loadLibrary();
     }
+
 
 
     private GUI(String windowHeader) throws IOException, ClassNotFoundException {
@@ -411,32 +413,22 @@ class GUI extends JFrame implements ActionListener {
 
         //title sort of
         JLabel text = new JLabel(books.size() == 0 ? "Similar not titles found" : "Similar titles found:");
+
         text.setFont(new Font("Arial", Font.BOLD, 25));
         var textP = new JPanel();
         text.setPreferredSize(new Dimension(400, 50));
         textP.add(text);
         window.add(textP, BorderLayout.NORTH);
 
-        //file thingy (CLUSTER OF RIGHT)
         JPanel rightPanel = new JPanel();
-//
-//        JTextArea display = new JTextArea();
-//        String equalBooks = "";
-//        var equal = searchBook(book, 0.1); //<- parametrizar este valor??
-//        for (int i = 0; i < equal.size(); i++) {
-//            equalBooks = equalBooks + equal.get(i) + "\n";
-//        }
-//        display.setText(equalBooks);
-//        display.setPreferredSize(new Dimension(200, 250));
-//        display.setEditable(false);
-        var names = new String[books.size()];
-        {
-            int i = 0;
-            for (var item : books) {
-                names[i++] = (item.name);
-            }
+        DefaultListModel<ProcessedBooksResult> listModel = new DefaultListModel<>();
+
+        for (var item : books) {
+            listModel.addElement(item);
         }
-        JList<String> display = new JList<String>(names);
+        JList<ProcessedBooksResult> display = new JList<>(listModel);
+
+        display.setCellRenderer(new BookListItem());
         display.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         JScrollPane scroll = new JScrollPane(display);
         scroll.setPreferredSize(new Dimension(450, 150));
@@ -463,9 +455,54 @@ class GUI extends JFrame implements ActionListener {
         window.setResizable(false);
     }
 
-    public static void loadingExample() {
+    private void allSimilarContent() {
+//        var toShow = allSim();
+//        JFrame window = new JFrame();
+//        window.setLayout(new BorderLayout(0, 1));
+//
+//        //title sort of
+//        JLabel text = new JLabel(books.size() == 0 ? "Similar not titles found" : "Similar titles found:");
+//
+//        text.setFont(new Font("Arial", Font.BOLD, 25));
+//        var textP = new JPanel();
+//        text.setPreferredSize(new Dimension(400, 50));
+//        textP.add(text);
+//        window.add(textP, BorderLayout.NORTH);
+//
+//        JPanel rightPanel = new JPanel();
+//        DefaultListModel<ProcessedBooksResult> listModel = new DefaultListModel<>();
+//
+//        for (var item : books) {
+//            listModel.addElement(item);
+//        }
+//        JList<ProcessedBooksResult> display = new JList<>(listModel);
+//
+//        display.setCellRenderer(new BookListItem());
+//        display.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+//        JScrollPane scroll = new JScrollPane(display);
+//        scroll.setPreferredSize(new Dimension(450, 150));
+//        scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+//        rightPanel.add(scroll);
+//        window.add(rightPanel, BorderLayout.CENTER);
+//
+//        //button
+//        var okay = new JButton();
+//        okay.setText("OK");
+//        okay.addActionListener((e) -> {
+//            window.dispose();
+//        });
+//        var okayP = new JPanel();
+//        okayP.add(okay);
+//        window.add(okayP, BorderLayout.SOUTH);
+//
+//        //JFrame settings
+//        window.setSize(500, 300);
+//        int x = (screenSize.width - window.getWidth()) / 2;
+//        int y = (screenSize.height - window.getHeight()) / 2;
+//        window.setLocation(x, y);
+//        window.setVisible(true);
+//        window.setResizable(false);
     }
-
     private void parsePopupDirectory() {
         JFileChooser fileChooser = new JFileChooser(".");
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -475,15 +512,17 @@ class GUI extends JFrame implements ActionListener {
         if (option == JFileChooser.APPROVE_OPTION) {
             setCurrentDirectory(fileChooser.getSelectedFile());
             JPanel p = new JPanel();
+            JLabel text = new JLabel("This might take a while depending on the size of the dataset");
+            p.add(text);
             final JProgressBar pr = new JProgressBar();
             pr.setStringPainted(true);
             pr.setValue(0);
-            pr.setSize(new Dimension(100, 23));
+            pr.setPreferredSize(new Dimension(300, 25));
             p.add(pr);
-            JFrame j = new JFrame();
-            j.setSize(400, 100);
-            j.add(p);
-            j.setVisible(true);
+            JFrame window = new JFrame("Parsing Directory");
+            window.setSize(400, 100);
+            window.add(p);
+            window.setVisible(true);
             parseDirectory(progress);
             final SwingWorker w = new SwingWorker() {
                 @Override
@@ -492,7 +531,7 @@ class GUI extends JFrame implements ActionListener {
                         try {
                             double p = progress.get();
                             pr.setValue((int) (p * 100));
-                            j.repaint();
+                            window.repaint();
                             pr.setString((int) (p * 100) + "%");
                             Thread.sleep(100);
                         } catch (InterruptedException ex) {
@@ -500,9 +539,10 @@ class GUI extends JFrame implements ActionListener {
                         }
                     } while (!progress.get().equals(1.0));
                     pr.setValue((int) (100));
-                    j.repaint();
+                    window.repaint();
                     pr.setString((int) (100) + "%");
                     updateButtonClickability();
+                    window.dispose();
                     return 0;
                 }
             };
