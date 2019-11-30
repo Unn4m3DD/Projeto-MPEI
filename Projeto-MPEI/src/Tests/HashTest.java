@@ -60,19 +60,21 @@ public class HashTest {
         int values = Integer.MAX_VALUE / 100;
         int leftBound = Integer.MIN_VALUE/100;  //numbers were changed because of overflow problems
         int rightBound = Integer.MAX_VALUE/100;
-        long totalSize = rightBound + Math.abs(leftBound);
+        //long totalSize = rightBound + Math.abs(leftBound);
         int maxElementsSubSections = 100000;
-        long numberOfDivisions = totalSize / maxElementsSubSections;
+        long numberOfDivisions = (long) Math.ceil(values / maxElementsSubSections) +1;  //if i take this +1 out this wont work
         var divisions = new int[(int) numberOfDivisions][maxElementsSubSections];
+        var hashes = new int[values];
         int div = 0;
         int sub = 0;
         for (int i = 0; i < values; i++) {
             Random generator = new Random();
             var hash = (hash(generator.nextInt(), 3));
+            //hashes[i] = hash;
             if (sub < maxElementsSubSections) {
                 divisions[div][sub] = hash;
                 sub++;
-            } else {
+            } else if (sub == maxElementsSubSections) {
                 sub = 0;
                 div++;
             }
@@ -103,15 +105,12 @@ public class HashTest {
 
         var difference = new int[(int) numberOfDivisions];
         for (int i = 0; i < numberOfDivisions; i++) {
-            difference[i] = minMax[i][1] - minMax[i][0];
+            difference[i] = minMax[i][1] - minMax[i][0]; // max - min -> final - inicial
         }
 
         var divergences = new int[difference.length];
         for (int i = 0; i < divergences.length; i++) {
-            if(mean[i] == 0)
-                divergences[i]=0;
-            else
-                divergences[i] = difference[i] * 100 / mean[i];
+            divergences[i] = difference[i]/ mean[i];
         }
 
         System.out.println(Arrays.toString(divergences));
