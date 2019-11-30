@@ -16,14 +16,17 @@ import java.util.List;
 import static util.Environment.titleShingleSize;
 
 class Interface {
-    private static File currentDir = new File("books" + File.separator + "Spanish");
-    private static HashMap<String, ProcessedBooksResult> bookStockHashes = new HashMap<>();
+    private static File currentDir = new File("books" + File.separator + "English");
+    public static HashMap<String, ProcessedBooksResult> bookStockHashes = new HashMap<>();
     public static BloomFilter availableBooks = new BloomFilter();
     public static CountFilter stock;
     public static HashMap<String, LSH> bookStockFingerprints = new HashMap<>();
 
-    public static File setCurrentDirectory() {
+    public static File getCurrentDirectory() {
         return currentDir;
+    }
+    public static File setCurrentDirectory(File dir) {
+        return currentDir = dir;
     }
 
     //This function may not download numOfBooks, this argument is just an indication
@@ -33,21 +36,18 @@ class Interface {
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
-//        Mutable<Double> prog = new Mutable<>(0.0);
-//        parseDirectory(prog);
-//        while (!prog.get().equals(1.0))
-//            try {
-//                Thread.sleep(1000);
-//            } catch (InterruptedException ie) {
-//                ie.printStackTrace();
-//            }
-//        save(new File("savetest.ser"));
-        load(new File("savetest.ser"));
-        System.out.println(searchBook("Merodeadores ", .1));
-        System.out.println(bookStockHashes);
-        System.out.println(checkBook("Los majos de Cádiz"));
-        System.out.println(checkBook("Los pescadores de Trépang"));
-        //System.out.println(allSim());
+        Mutable<Double> prog = new Mutable<>(0.0);
+        parseDirectory(prog);
+        while (!prog.get().equals(1.0))
+            try {
+                Thread.sleep(40 * 60 * 1000 / 100);
+                System.out.println(prog.get());
+            } catch (InterruptedException ie) {
+                ie.printStackTrace();
+            }
+        save(new File("english.ser"));
+//        load(new File("savetest.ser"));
+        System.out.println(allSim());
 
     }
 
@@ -61,21 +61,21 @@ class Interface {
         }
     }
 
-    /*public static  HashMap<ProcessedBooksResult, List<ProcessedBooksResult>> allSim() {
-        // TODO: 27/11/2019 Refazer isto pq está só estupido 
-        
+    public static HashMap<ProcessedBooksResult, List<ProcessedBooksResult>> allSim() {
+        // TODO: 27/11/2019 Refazer isto pq está só estupido
 //        generateFingerprint();
-//        HashMap<ProcessedBooksResult, List<ProcessedBooksResult>> result = new HashMap<>();
-//        for (var key1 : bookStockFingerprints.keySet()) {
-//            result.put(bookStockHashes.get(key1), new LinkedList<>());
-//            for (var key2 : bookStockFingerprints.keySet()) {
-//                if (0.5 < bookStockHashes.get(key1).minHashedContent.calcSimTo(bookStockHashes.get(key2).minHashedContent) && (!key1.equals(key2))){
-//                    result.get(bookStockHashes.get(key1)).add(bookStockHashes.get(key2));
-//                }
-//            }
-//        }
-//        return result;
-    }*/
+        HashMap<ProcessedBooksResult, List<ProcessedBooksResult>> result = new HashMap<>();
+        for (var key1 : bookStockHashes.keySet()) {
+            result.put(bookStockHashes.get(key1), new LinkedList<>());
+            for (var key2 : bookStockHashes.keySet()) {
+                if (!result.keySet().contains(key2))
+                    if (0.4 < bookStockHashes.get(key1).minHashedContent.calcSimTo(bookStockHashes.get(key2).minHashedContent) && (!key1.equals(key2))) {
+                        result.get(bookStockHashes.get(key1)).add(bookStockHashes.get(key2));
+                    }
+            }
+        }
+        return result;
+    }
 
     public static List<ProcessedBooksResult> searchBook(String name, double thr) {
         ArrayList<ProcessedBooksResult> result = new ArrayList<>();
@@ -89,7 +89,7 @@ class Interface {
                         MinHash.shinglesFromCharArr(list, titleShingleSize)
                 );
         for (var item : bookStockHashes.values()) {
-            if (item.minHashedTitle.calcSimTo(nameMinHash) > thr) {
+            if (item.minHashedTitle.calcSimTo(nameMinHash) >= thr) {
                 result.add(item);
             }
         }

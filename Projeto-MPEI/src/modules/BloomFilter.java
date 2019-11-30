@@ -17,16 +17,16 @@ public class BloomFilter implements Serializable {
         this.k = k;
         this.filter = new boolean[n];
     }
+
     public BloomFilter() {
+    }
+
+    public void setParams(int n, int k) {
         this.n = n;
         this.k = k;
         this.filter = new boolean[n];
     }
-    public void setParams(int n, int k){
-        this.n = n;
-        this.k = k;
-        this.filter = new boolean[n];
-    }
+
     public static int optimalK(int n, int m) {
         return optimalK((long) n, (long) m);
     }
@@ -65,8 +65,9 @@ public class BloomFilter implements Serializable {
 
 
     public boolean isElement(String elem) {
+        if (filter == null) return false;
         for (var i = 0; i < k; i++) {
-            if (!filter[Math.abs(hash(elem.hashCode(), i))% n]) {
+            if (!filter[Math.abs(hash(elem.hashCode(), i)) % n]) {
                 return false;
             }
         }
