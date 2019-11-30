@@ -1,10 +1,8 @@
 package Tests;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
-
-import util.Environment.*;
 
 import static modules.Hash.hash;
 import static util.Environment.numberOfHashesForMinHash;
@@ -19,6 +17,11 @@ public class HashTest {
      and if different hash functions map the same value do distinct number
     */
     public static void main(String[] args) {
+        //test1();
+        test2();
+    }
+
+    public static void test1() {
         System.out.printf("Iniciando teste das funções de hash ");
         double totalError = 0;
         for (int x = 1; x < testWeight; x++) {
@@ -40,8 +43,8 @@ public class HashTest {
             for (int i = 0; i < ns.length; i++) {
                 if (hashes[i].size() != numOfHashes) err++;
             }
-            if ((x ) % (testWeight / 10) == 0)
-                System.out.printf((double)x / testWeight + ", ");
+            if ((x) % (testWeight / 10) == 0)
+                System.out.printf((double) x / testWeight + ", ");
             totalError += ((double) err / numOfHashes);
         }
         System.out.println();
@@ -50,5 +53,67 @@ public class HashTest {
             System.out.println("Erro no teste da função de hash");
         if (totalError > accuracy)
             System.out.println("Passou!");
+    }
+
+    public static void test2() {
+        //TODO revamp this whole mess
+        int values = Integer.MAX_VALUE / 100;
+        int leftBound = Integer.MIN_VALUE/100;  //numbers were changed because of overflow problems
+        int rightBound = Integer.MAX_VALUE/100;
+        long totalSize = rightBound + Math.abs(leftBound);
+        int maxElementsSubSections = 100000;
+        long numberOfDivisions = totalSize / maxElementsSubSections;
+        var divisions = new int[(int) numberOfDivisions][maxElementsSubSections];
+        int div = 0;
+        int sub = 0;
+        for (int i = 0; i < values; i++) {
+            Random generator = new Random();
+            var hash = (hash(generator.nextInt(), 3));
+            if (sub < maxElementsSubSections) {
+                divisions[div][sub] = hash;
+                sub++;
+            } else {
+                sub = 0;
+                div++;
+            }
+        }
+        int[] mean = new int[(int) numberOfDivisions];
+        for (int i = 0; i < numberOfDivisions; i++) {
+            int sum = 0;
+            for (int j = 0; j < maxElementsSubSections; j++) {
+                sum += divisions[i][j];
+            }
+            mean[i] = (int) (sum / maxElementsSubSections);
+        }
+        int[][] minMax = new int[(int) numberOfDivisions][2];
+        for (int i = 0; i < numberOfDivisions; i++) {
+            int min = (int) divisions[i][0];
+            int max = (int) divisions[i][0];
+            for (int j = 1; j < maxElementsSubSections; j++) {
+                if (divisions[i][j] > max) {
+                    max = (int) divisions[i][j];
+                }
+                if (divisions[i][j] < min) {
+                    min = (int) divisions[i][j];
+                }
+            }
+            minMax[i][0] = min;
+            minMax[i][1] = max;
+        }
+
+        var difference = new int[(int) numberOfDivisions];
+        for (int i = 0; i < numberOfDivisions; i++) {
+            difference[i] = minMax[i][1] - minMax[i][0];
+        }
+
+        var divergences = new int[difference.length];
+        for (int i = 0; i < divergences.length; i++) {
+            if(mean[i] == 0)
+                divergences[i]=0;
+            else
+                divergences[i] = difference[i] * 100 / mean[i];
+        }
+
+        System.out.println(Arrays.toString(divergences));
     }
 }
