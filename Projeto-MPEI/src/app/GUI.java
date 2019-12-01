@@ -9,10 +9,8 @@ TODO 22/11/2019
 
 package app;
 
-import util.Mutable;
-import util.ProcessedBooksResult;
-import util.SimContainer;
-import util.TimeThis;
+import modules.MinHash;
+import util.*;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -26,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static app.Interface.*;
+import static util.Environment.contentShingleSize;
 
 /* D:\dev\Projeto-MPEI\books\Spanish */
 class GUI extends JFrame implements ActionListener {
@@ -81,34 +80,37 @@ class GUI extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(buttons.get("Search Title")))
             searchTitle();
-        if (e.getSource().equals(buttons.get("Check Title")))
+        else if (e.getSource().equals(buttons.get("Check Title")))
             checkTitle();
-        if (e.getSource().equals(buttons.get("Request book")))
+        else if (e.getSource().equals(buttons.get("Request Book")))
             requestBook();
-        if (e.getSource().equals(buttons.get("Return book")))
+        else if (e.getSource().equals(buttons.get("Return Book")))
             returnBook();
-        if (e.getSource().equals(buttons.get("All Similar Title")))
+        else if (e.getSource().equals(buttons.get("All Similar Title")))
             allSimilarTitle();
-        if (e.getSource().equals(buttons.get("Check book Availability")))
-            assert true;
-        if (e.getSource().equals(buttons.get("All Similar Content")))
+        else if (e.getSource().equals(buttons.get("Check book Availability")))
+            checkBookAvailability();
+        else if (e.getSource().equals(buttons.get("All Similar Content")))
             allSimilarContent();
-        if (e.getSource().equals(buttons.get("Compare 2 Books")))
-            assert true;
-        if (e.getSource().equals(menuItems.get("Parse Directory")))
+        else if (e.getSource().equals(buttons.get("Compare 2 Books")))
+            compare2Books();
+        else if (e.getSource().equals(menuItems.get("Parse Directory")))
             parsePopupDirectory();
-        if (e.getSource().equals(menuItems.get("Save Library")))
+        else if (e.getSource().equals(menuItems.get("Save Library")))
             saveLibrary();
-        if (e.getSource().equals(menuItems.get("Load Library")))
+        else if (e.getSource().equals(menuItems.get("Load Library")))
             loadLibrary();
-        if (e.getSource().equals(menuItems.get("Download Data Set")))
+        else if (e.getSource().equals(menuItems.get("Download Data Set")))
             downloadDataSetPopup();
+        else if (e.getSource().equals(menuItems.get("Calculate Jaccard Index")))
+            jaccardSim();
+
+
     }
 
 
     private GUI(String windowHeader) throws IOException, ClassNotFoundException {
         super(windowHeader);
-        load(new File("./save.ser"));
         initializeButtonsAndPanels();
         setLayout(new GridLayout(3, 3));
         Dimension windowSize = new Dimension(1000, 600);
@@ -215,6 +217,85 @@ class GUI extends JFrame implements ActionListener {
         window.setResizable(false);
     }
 
+
+    private void checkBookAvailability() {
+        JFrame p = new JFrame();
+        p.setLayout(new BorderLayout());
+        //header
+        JLabel text = new JLabel();
+        text.setText("Insert book name");
+        JPanel textPanel = new JPanel();
+        textPanel.setLayout(new BorderLayout());
+        text.setFont(new Font("Arial", Font.BOLD, 25));
+        text.setHorizontalAlignment(0);
+        textPanel.add(text, BorderLayout.CENTER);
+        textPanel.setPreferredSize(new Dimension(400, 50));
+        p.add(textPanel, BorderLayout.NORTH);
+
+        //textfield
+        JTextField title = new JTextField();
+        JPanel insertPanel = new JPanel();
+        insertPanel.setPreferredSize(new Dimension(310, 30));
+        title.setPreferredSize(new Dimension(300, 25));
+        insertPanel.add(title);
+        p.add(insertPanel, BorderLayout.CENTER);
+
+        //button
+        JPanel searchPanel = new JPanel();
+        JButton search = new JButton();
+        search.setText("Check");
+        search.addActionListener((e) -> {
+            String book = title.getText();
+            String s = "";
+            if (Interface.isAvailable(book))
+                s = "Book is available for request";
+            else
+                s = "Book is not available for request";
+            JFrame window = new JFrame();
+            window.setLayout(new GridLayout(1, 2));
+
+            //title sort of
+            JLabel inneText = new JLabel(s);
+            inneText.setFont(new Font("Arial", Font.BOLD, 25));
+            inneText.setText(s);
+
+            //button
+            var okay = new JButton();
+            okay.setText("OK");
+            okay.addActionListener((e2) -> {
+                window.dispose();
+            });
+
+            //CLUSTER OF LEFT
+            var left = new JPanel(new GridLayout(2, 1));
+            var textP = new JPanel(new GridBagLayout());
+            textP.add(inneText);
+            left.add(textP);
+            var okayP = new JPanel();
+            okayP.add(okay, BorderLayout.CENTER);
+            left.add(okayP);
+            window.add(left);
+            window.setSize(500, 300);
+            int x = (screenSize.width - window.getWidth()) / 2;
+            int y = (screenSize.height - window.getHeight()) / 2;
+            window.setLocation(x, y);
+            window.setVisible(true);
+            window.setResizable(false);
+        });
+        search.setPreferredSize(new Dimension(150, 25));
+        searchPanel.add(search);
+        p.add(searchPanel, BorderLayout.SOUTH);
+
+
+        p.setSize(400, 150);
+        int x = (screenSize.width - p.getWidth()) / 2;
+        int y = (screenSize.height - p.getHeight()) / 2;
+        p.setLocation(x, y);
+        p.setVisible(true);
+        p.setResizable(false);
+
+    }
+
     private static void requestBook() {
         JFrame p = new JFrame();
         p.setLayout(new BorderLayout());
@@ -243,7 +324,41 @@ class GUI extends JFrame implements ActionListener {
         search.setText("Request");
         search.addActionListener((e) -> {
             String book = title.getText();
-            bookRequested(book);
+            String s = "";
+            if (Interface.requestBook(book))
+                s = "Book requested";
+            else
+                s = "Book not requested";
+            JFrame window = new JFrame();
+            window.setLayout(new GridLayout(1, 2));
+
+            //title sort of
+            JLabel inneText = new JLabel(s);
+            inneText.setFont(new Font("Arial", Font.BOLD, 25));
+            inneText.setText(s);
+
+            //button
+            var okay = new JButton();
+            okay.setText("OK");
+            okay.addActionListener((e2) -> {
+                window.dispose();
+            });
+
+            //CLUSTER OF LEFT
+            var left = new JPanel(new GridLayout(2, 1));
+            var textP = new JPanel(new GridBagLayout());
+            textP.add(inneText);
+            left.add(textP);
+            var okayP = new JPanel();
+            okayP.add(okay, BorderLayout.CENTER);
+            left.add(okayP);
+            window.add(left);
+            window.setSize(500, 300);
+            int x = (screenSize.width - window.getWidth()) / 2;
+            int y = (screenSize.height - window.getHeight()) / 2;
+            window.setLocation(x, y);
+            window.setVisible(true);
+            window.setResizable(false);
         });
         search.setPreferredSize(new Dimension(150, 25));
         searchPanel.add(search);
@@ -260,41 +375,6 @@ class GUI extends JFrame implements ActionListener {
     }
 
     private static void bookRequested(String book) {
-        String s = "";
-        if (Interface.requestBook(book))
-            s = "Book requested";
-        else
-            s = "Book not requested";
-        JFrame window = new JFrame();
-        window.setLayout(new GridLayout(1, 2));
-
-        //title sort of
-        JLabel text = new JLabel(s);
-        text.setFont(new Font("Arial", Font.BOLD, 25));
-        text.setText(s);
-
-        //button
-        var okay = new JButton();
-        okay.setText("OK");
-        okay.addActionListener((e) -> {
-            window.dispose();
-        });
-
-        //CLUSTER OF LEFT
-        var left = new JPanel(new GridLayout(2, 1));
-        var textP = new JPanel(new GridBagLayout());
-        textP.add(text);
-        left.add(textP);
-        var okayP = new JPanel();
-        okayP.add(okay, BorderLayout.CENTER);
-        left.add(okayP);
-        window.add(left);
-        window.setSize(500, 300);
-        int x = (screenSize.width - window.getWidth()) / 2;
-        int y = (screenSize.height - window.getHeight()) / 2;
-        window.setLocation(x, y);
-        window.setVisible(true);
-        window.setResizable(false);
     }
 
     private static void checkTitle() {
@@ -404,6 +484,58 @@ class GUI extends JFrame implements ActionListener {
 
 
         p.setSize(400, 150);
+        int x = (screenSize.width - p.getWidth()) / 2;
+        int y = (screenSize.height - p.getHeight()) / 2;
+        p.setLocation(x, y);
+        p.setVisible(true);
+        p.setResizable(false);
+    }
+
+    private void compare2Books() {
+        JFrame p = new JFrame("Compare 2 Books");
+        p.setLayout(new BorderLayout());
+        //header
+        JLabel text = new JLabel();
+        text.setText("Select 2 books to compare");
+        JPanel textPanel = new JPanel();
+        textPanel.setLayout(new BorderLayout());
+        text.setFont(new Font("Arial", Font.BOLD, 25));
+        text.setHorizontalAlignment(0);
+        textPanel.add(text, BorderLayout.CENTER);
+        textPanel.setPreferredSize(new Dimension(400, 50));
+        p.add(textPanel, BorderLayout.NORTH);
+
+        //textfield
+        JPanel insertPanel = new JPanel();
+        JComboBox<ProcessedBooksResult> books1 = new JComboBox<>();
+        JComboBox<ProcessedBooksResult> books2 = new JComboBox<>();
+        for (var book : getAvailableBooks().values()) {
+            books1.addItem(book);
+            books2.addItem(book);
+        }
+        books1.setPreferredSize(new Dimension(130, 30));
+        books2.setPreferredSize(new Dimension(130, 30));
+        insertPanel.add(books1, BorderLayout.WEST);
+        insertPanel.add(books2, BorderLayout.EAST);
+        insertPanel.setPreferredSize(new Dimension(310, 50));
+        p.add(insertPanel, BorderLayout.CENTER);
+
+        //button
+        JPanel comparePanel = new JPanel();
+        JButton compare = new JButton();
+        compare.setText("Compare");
+        compare.addActionListener((e) -> {
+            JOptionPane.showMessageDialog(this, "<html>The similarity between 2 books is " +
+                    ((ProcessedBooksResult) books1.getSelectedItem()).minHashedContent.calcSimTo(
+                            ((ProcessedBooksResult) books2.getSelectedItem()).minHashedContent
+                    ) + "</html>");
+        });
+        compare.setPreferredSize(new Dimension(150, 25));
+        comparePanel.add(compare);
+        p.add(comparePanel, BorderLayout.SOUTH);
+
+
+        p.setSize(400, 175);
         int x = (screenSize.width - p.getWidth()) / 2;
         int y = (screenSize.height - p.getHeight()) / 2;
         p.setLocation(x, y);
@@ -679,6 +811,25 @@ class GUI extends JFrame implements ActionListener {
         window.setResizable(false);
     }
 
+    private void jaccardSim() {
+        JOptionPane.showMessageDialog(this, "Select 2 files to compare");
+        JFileChooser fileChooser = new JFileChooser(".");
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        fileChooser.setDialogTitle("Select Directory");
+        int option = fileChooser.showOpenDialog(this);
+        if (option == JFileChooser.APPROVE_OPTION) {
+            JFileChooser fileChooser2 = new JFileChooser(".");
+            fileChooser2.setAcceptAllFileFilterUsed(false);
+            fileChooser2.setDialogTitle("Select Directory");
+            int option2 = fileChooser2.showOpenDialog(this);
+            if (option2 == JFileChooser.APPROVE_OPTION) {
+                JOptionPane.showMessageDialog(this, "The Jaccard similarity between 2 files is " +
+                        MinHash.jaccardIndex(fileChooser.getSelectedFile(), fileChooser2.getSelectedFile(), contentShingleSize));
+            }
+
+        }
+    }
+
     private void parsePopupDirectory() {
         JFileChooser fileChooser = new JFileChooser(".");
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -730,10 +881,10 @@ class GUI extends JFrame implements ActionListener {
 
     private void downloadDataSetPopup() {
         JFrame qttFrame = new JFrame("Download Dataset");
-        JPanel outerPanel = new JPanel(new GridLayout(2,1));
+        JPanel outerPanel = new JPanel(new GridLayout(2, 1));
         qttFrame.setSize(new Dimension(600, 125));
         JPanel p1 = new JPanel();
-        JLabel label = new JLabel("<html>Insert approximate maximum of books to download (this number is merely indicative)<br><html>");
+        JLabel label = new JLabel("<html>Insert approximate maximum of books to download (this number is merely indicative)<br></html>");
         p1.add(label);
         JPanel p2 = new JPanel();
         JTextField input = new JTextField("2500");
@@ -746,12 +897,12 @@ class GUI extends JFrame implements ActionListener {
         qttFrame.add(outerPanel);
         qttFrame.setLocationRelativeTo(this);
         qttFrame.setVisible(true);
-        btnInput.addActionListener((e)->{
+        btnInput.addActionListener((e) -> {
             final int numberOfBooks;
-            try{
+            try {
                 numberOfBooks = Integer.parseInt(input.getText());
-                if(numberOfBooks <= 0) throw new Exception();
-            } catch (Exception exp){
+                if (numberOfBooks <= 0) throw new Exception();
+            } catch (Exception exp) {
                 JOptionPane.showMessageDialog(null, "Insert a valid quantity");
                 return;
             }
@@ -814,7 +965,7 @@ class GUI extends JFrame implements ActionListener {
             try {
                 save(fileChooser.getSelectedFile());
             } catch (IOException ioe) {
-                JOptionPane.showMessageDialog(null, "An error occurred whilst saving");
+                JOptionPane.showMessageDialog(this, "An error occurred whilst saving");
             }
         }
     }
@@ -828,9 +979,9 @@ class GUI extends JFrame implements ActionListener {
             try {
                 load(fileChooser.getSelectedFile());
             } catch (IOException ioe) {
-                JOptionPane.showMessageDialog(null, "An error occurred whilst saving");
+                JOptionPane.showMessageDialog(this, "An error occurred whilst loading");
             } catch (ClassNotFoundException cnfe) {
-                JOptionPane.showMessageDialog(null, "The saved document doesn't match the required file format");
+                JOptionPane.showMessageDialog(this, "The saved document doesn't match the required file format");
             }
         }
         updateButtonClickability();

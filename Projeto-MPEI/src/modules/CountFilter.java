@@ -15,30 +15,16 @@ public class CountFilter implements Serializable {
         this.filter = new int[n];
     }
 
-
-    public static int optimalK(int n, int m) {
-        return optimalK((long) n, (long) m);
-    }
-
-    private static int optimalK(long n, long m) {
-        int optK = (int) Math.round(n * 0.693 / m);
-        return optK == 0 ? 1 : optK;
-    }
-
-    public double probErr(int numElem) {
-        return Math.pow(1 - Math.pow(1 - (double) 1 / n, k * numElem), k);
-    }
-
     public void addElement(String elem) {
         for (var i = 0; i < k; i++) {
-            filter[hash(elem, i)]++;
+            filter[hash(elem, i) % n]++;
         }
     }
 
 
     public boolean isElement(String elem) {
         for (var i = 0; i < k; i++) {
-            if (filter[hash(elem, i)] == 0) {
+            if (filter[hash(elem, i) % n] == 0) {
                 return false;
             }
         }
@@ -59,7 +45,7 @@ public class CountFilter implements Serializable {
 
     public void remElement(String elem) {
         for (var i = 0; i < k; i++) {
-            filter[hash(elem, i)]--;
+            filter[hash(elem, i) % n]--;
         }
     }
 }

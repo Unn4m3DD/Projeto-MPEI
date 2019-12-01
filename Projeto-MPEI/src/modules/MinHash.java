@@ -32,7 +32,7 @@ public class MinHash implements Serializable {
         t.end();
     }
 
-    public static double jaccardIndex(File file1, File file2, int shingleSize) throws FileNotFoundException {
+    public static double jaccardIndex(File file1, File file2, int shingleSize) {
         var characterList1 = shinglesFromCharArray((new Book(file1)).getContent(), shingleSize);
         var characterList2 = shinglesFromCharArray((new Book(file2)).getContent(), shingleSize);
 

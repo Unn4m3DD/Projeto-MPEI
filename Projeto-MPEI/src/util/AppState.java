@@ -9,12 +9,12 @@ import java.util.HashMap;
 public class AppState implements Serializable {
     private HashMap<String, ProcessedBooksResult> bookStockHashes;
     private BloomFilter availableBooks;
-    private CountFilter stock;
+    private CountFilter requestedBooks;
 
-    public AppState(HashMap<String, ProcessedBooksResult> bookStockHashes, BloomFilter availableBooks, CountFilter stock) {
+    public AppState(HashMap<String, ProcessedBooksResult> bookStockHashes, BloomFilter availableBooks, CountFilter requestedBooks) {
         this.bookStockHashes = bookStockHashes;
         this.availableBooks = availableBooks;
-        this.stock = stock;
+        this.requestedBooks = requestedBooks;
     }
 
     public HashMap<String, ProcessedBooksResult> getBookStockHashes() {
@@ -25,7 +25,7 @@ public class AppState implements Serializable {
         return availableBooks;
     }
 
-    public CountFilter getStock() {
-        return stock;
+    public CountFilter getRequestedBooks() {
+        return requestedBooks;
     }
 }

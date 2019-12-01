@@ -3,7 +3,6 @@ package app;
 import Threads.BookDirectoryProcessor;
 import modules.BloomFilter;
 import modules.CountFilter;
-import modules.LSH;
 import modules.MinHash;
 import util.*;
 
@@ -15,8 +14,7 @@ import static util.Environment.titleShingleSize;
 class Interface {
     public static HashMap<String, ProcessedBooksResult> bookStockHashes = new HashMap<>();
     public static BloomFilter availableBooks = new BloomFilter();
-    public static CountFilter stock;
-    public static HashMap<String, LSH> bookStockFingerprints = new HashMap<>();
+    public static CountFilter requestedBooks;
 
     public static HashMap<Pair<String, String>, Pair<Double, Double>> similarity = new HashMap<>();
 
@@ -28,12 +26,6 @@ class Interface {
 
     public static boolean checkBook(String name) {
         return availableBooks.isElement(name);
-    }
-
-    private static void generateFingerprint() {
-        for (var key : bookStockHashes.keySet()) {
-            bookStockFingerprints.put(key, new LSH(bookStockHashes.get(key).minHashedContent, 4));
-        }
     }
 
     private static void allSim() {
@@ -108,17 +100,23 @@ class Interface {
         return result;
     }
 
+    public static boolean isAvailable(String name){
+        if (!availableBooks.isElement(name)) return false;
+        if (requestedBooks.isElement(name)) return false;
+        return true;
+    }
+
     public static boolean requestBook(String name) {
         if (!availableBooks.isElement(name)) return false;
-        if (stock.isElement(name)) return false;
-        stock.addElement(name);
+        if (requestedBooks.isElement(name)) return false;
+        requestedBooks.addElement(name);
         return true;
     }
 
     public static boolean returnBook(String name) {
         if (!availableBooks.isElement(name)) return false;
-        if (!stock.isElement(name)) return false;
-        stock.remElement(name);
+        if (!requestedBooks.isElement(name)) return false;
+        requestedBooks.remElement(name);
         return true;
     }
 
@@ -134,20 +132,20 @@ class Interface {
         BookDirectoryProcessor processor = new BookDirectoryProcessor(dir, progress, availableBooks);
         processor.start();
         bookStockHashes = processor.result;
-        while (availableBooks == null)
+        while (availableBooks == null || availableBooks.getN() == 0)
             try {
                 Thread.sleep(100);
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
             }
-        stock = new CountFilter(availableBooks.getN(), availableBooks.getK());
+        requestedBooks = new CountFilter(availableBooks.getN(), availableBooks.getK());
 
     }
 
     public static void save(File destination) throws IOException {
         FileOutputStream file = new FileOutputStream(destination);
         ObjectOutputStream out = new ObjectOutputStream(file);
-        out.writeObject(new AppState(bookStockHashes, availableBooks, stock));
+        out.writeObject(new AppState(bookStockHashes, availableBooks, requestedBooks));
         out.close();
         file.close();
     }
@@ -158,7 +156,7 @@ class Interface {
         AppState tmp = (AppState) in.readObject();
         bookStockHashes = tmp.getBookStockHashes();
         availableBooks = tmp.getAvailableBooks();
-        stock = tmp.getStock();
+        requestedBooks = tmp.getRequestedBooks();
         in.close();
         file.close();
     }
