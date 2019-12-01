@@ -42,11 +42,6 @@ class GUI extends JFrame implements ActionListener {
     String[] fileMenuItemKeys = new String[]{"Parse Directory", "Save Library", "Load Library", "Exit"};
     String[] toolsMenuItemKeys = new String[]{"Calculate Jaccard Index", "Download Data Set"};
 
-    //TODO check if its working AKA showing the actual book names
-    //TODO check if tis working aka showing if the book is or is not a part of the inventory
-    //TODO check if its working aka showing book request and seeing if it actually requested
-    //TODO check if its working AKA showing the book was returned and it being actually returned
-
     private void updateButtonClickability() {
         for (var button : buttons.values()) {
             button.setEnabled(bookStockHashes.keySet().size() != 0);
@@ -106,6 +101,8 @@ class GUI extends JFrame implements ActionListener {
             saveLibrary();
         if (e.getSource().equals(menuItems.get("Load Library")))
             loadLibrary();
+        if (e.getSource().equals(menuItems.get("Download Data Set")))
+            downloadDataSetPopup();
     }
 
 
@@ -689,7 +686,6 @@ class GUI extends JFrame implements ActionListener {
         fileChooser.setDialogTitle("Select Directory");
         int option = fileChooser.showOpenDialog(this);
         if (option == JFileChooser.APPROVE_OPTION) {
-            setCurrentDirectory(fileChooser.getSelectedFile());
             JPanel p = new JPanel();
             JLabel text = new JLabel("This might take a while depending on the size of the dataset");
             p.add(text);
@@ -701,8 +697,10 @@ class GUI extends JFrame implements ActionListener {
             JFrame window = new JFrame("Parsing Directory");
             window.setSize(400, 100);
             window.add(p);
+            window.setLocationRelativeTo(this);
             window.setVisible(true);
-            parseDirectory(progress);
+            progress.set(0.0);
+            parseDirectory(fileChooser.getSelectedFile(), progress);
             final SwingWorker w = new SwingWorker() {
                 @Override
                 protected Object doInBackground() throws Exception {
@@ -727,6 +725,83 @@ class GUI extends JFrame implements ActionListener {
             };
             w.execute();
         }
+
+    }
+
+    private void downloadDataSetPopup() {
+        JFrame qttFrame = new JFrame("Download Dataset");
+        JPanel outerPanel = new JPanel(new GridLayout(2,1));
+        qttFrame.setSize(new Dimension(600, 125));
+        JPanel p1 = new JPanel();
+        JLabel label = new JLabel("<html>Insert approximate maximum of books to download (this number is merely indicative)<br><html>");
+        p1.add(label);
+        JPanel p2 = new JPanel();
+        JTextField input = new JTextField("2500");
+        input.setPreferredSize(new Dimension(100, 25));
+        JButton btnInput = new JButton("Download");
+        p2.add(input);
+        p2.add(btnInput);
+        outerPanel.add(p1);
+        outerPanel.add(p2);
+        qttFrame.add(outerPanel);
+        qttFrame.setLocationRelativeTo(this);
+        qttFrame.setVisible(true);
+        btnInput.addActionListener((e)->{
+            final int numberOfBooks;
+            try{
+                numberOfBooks = Integer.parseInt(input.getText());
+                if(numberOfBooks <= 0) throw new Exception();
+            } catch (Exception exp){
+                JOptionPane.showMessageDialog(null, "Insert a valid quantity");
+                return;
+            }
+            qttFrame.dispose();
+            JFileChooser fileChooser = new JFileChooser(".");
+            fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            fileChooser.setAcceptAllFileFilterUsed(false);
+            fileChooser.setDialogTitle("Select Directory");
+            int option = fileChooser.showOpenDialog(this);
+            if (option == JFileChooser.APPROVE_OPTION) {
+                JPanel p = new JPanel();
+                JLabel text = new JLabel("This might take a while depending on the size of the dataset");
+                p.add(text);
+                final JProgressBar pr = new JProgressBar();
+                pr.setStringPainted(true);
+                pr.setValue(0);
+                pr.setPreferredSize(new Dimension(300, 25));
+                p.add(pr);
+                JFrame window = new JFrame("Downloading Dataset");
+                window.setSize(400, 100);
+                window.add(p);
+                window.setLocationRelativeTo(this);
+                window.setVisible(true);
+                progress.set(0.0);
+                downloadTestData(fileChooser.getSelectedFile(), numberOfBooks, progress);
+                final SwingWorker w = new SwingWorker() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        do {
+                            try {
+                                double p = progress.get();
+                                pr.setValue((int) (p * 100));
+                                window.repaint();
+                                pr.setString((int) (p * 100) + "%");
+                                Thread.sleep(100);
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
+                        } while (!progress.get().equals(1.0));
+                        pr.setValue((int) (100));
+                        window.repaint();
+                        pr.setString((int) (100) + "%");
+                        updateButtonClickability();
+                        window.dispose();
+                        return 0;
+                    }
+                };
+                w.execute();
+            }
+        });
 
     }
 

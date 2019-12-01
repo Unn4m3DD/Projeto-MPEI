@@ -33,19 +33,16 @@ public class MinHash implements Serializable {
 
 
     public double calcSimTo(MinHash m) {
-        TimeThis t = new TimeThis("CalcSim", "vv");
         int counter = 0;
         for (var i = 0; i < signature.length; i++) {
             if (signature[i] != m.signature[i]) counter++;
         }
-        t.end();
         return 1 - (double) counter / (double) signature.length;
     }
 
     public static List<Integer> shinglesFromCharArr(ArrayList<Character> charArr, int size) {
         TimeThis t = new TimeThis("Shingle Creation", "v");
         ArrayList<Integer> result = new ArrayList<>(charArr.size());
-//        ArrayList<Integer> result = new ArrayList<>();
         for (var i = 0; i + size < charArr.size(); i++) {
             StringBuilder toAdd = new StringBuilder();
             for (var j = 0; j < size; j++) {

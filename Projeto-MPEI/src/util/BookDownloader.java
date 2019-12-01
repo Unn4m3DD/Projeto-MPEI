@@ -9,14 +9,25 @@ import java.util.LinkedList;
 import java.util.Scanner;
 
 
-public class BookDownloader {
+public class BookDownloader extends Thread {
     File dir;
+    Mutable<Double> progress;
+    int numOfBooks;
 
-    public BookDownloader(int numOfBooks, File dir) {
+    public BookDownloader(int numOfBooks, File dir, Mutable<Double> progress) {
         this.dir = dir;
+        this.progress = progress;
+        this.numOfBooks = numOfBooks;
+    }
+
+    @Override
+    public void run() {
         downloadBooks(numOfBooks);
+        System.gc();
         separateBooks(numOfBooks);
+        System.gc();
         filterBooks(numOfBooks);
+        System.gc();
         deleteLeftFiles();
     }
 
@@ -37,12 +48,22 @@ public class BookDownloader {
             ts.add(t);
         }
         try {
-            for (var t : ts) {
-                t.join();
+            boolean endend = false;
+            while (!endend) {
+                progress.set(0.0);
+                endend = true;
+                for (var t : ts) {
+                    if (!t.isAlive())
+                        progress.set(progress.get() + 1.0 / ts.size());
+                    else endend = false;
+                }
+                Thread.sleep(500);
             }
         } catch (InterruptedException ie) {
             ie.printStackTrace();
         }
+        progress.set(1.0);
+
     }
 
     private void separateBooks(int numOfBooks) {
@@ -58,11 +79,13 @@ public class BookDownloader {
                             File d = new File(dir.getAbsolutePath() + File.separator + split[1].trim());
                             if (!d.exists())
                                 d.mkdir();
-                            f.renameTo(new File(dir.getAbsolutePath() + File.separator + split[1].trim() + File.separator + idx + ".txt"));
+                            fs.close();
+
+                            if(!f.renameTo(new File(d.getAbsolutePath() + File.separator + idx + ".txt")))
+                                System.out.println("erro");
                             break;
                         }
                     }
-                    fs.close();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -74,7 +97,7 @@ public class BookDownloader {
 
     private void filterBooks(int numOfBooks) {
         for (var f : dir.listFiles()) {
-            if (!f.isDirectory() || f.listFiles().length < numOfBooks / 100) {
+            if (!f.isDirectory() || f.listFiles().length == 0) {
                 deleteDir(f);
             }
         }

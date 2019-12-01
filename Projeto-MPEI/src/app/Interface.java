@@ -15,7 +15,6 @@ import java.util.*;
 import static util.Environment.titleShingleSize;
 
 class Interface {
-    private static File currentDir = new File("books" + File.separator + "English");
     public static HashMap<String, ProcessedBooksResult> bookStockHashes = new HashMap<>();
     public static BloomFilter availableBooks = new BloomFilter();
     public static CountFilter stock;
@@ -23,33 +22,10 @@ class Interface {
 
     public static HashMap<Pair<String, String>, Pair<Double, Double>> similarity = new HashMap<>();
 
-    public static File getCurrentDirectory() {
-        return currentDir;
-    }
-
-    public static File setCurrentDirectory(File dir) {
-        return currentDir = dir;
-    }
-
     //This function may not download numOfBooks, this argument is just an indication
-    public static void downloadTestData(int numOfBooks) {
-        System.err.println("não te esqueças de indicar que o argumento é meramente indicativo");
-        new BookDownloader(numOfBooks, currentDir);
-    }
-
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
-        Mutable<Double> prog = new Mutable<>(0.0);
-        parseDirectory(prog);
-        while (!prog.get().equals(1.0))
-            try {
-                Thread.sleep(40 * 60 * 1000 / 100);
-                System.out.println(prog.get());
-            } catch (InterruptedException ie) {
-                ie.printStackTrace();
-            }
-        save(new File("english.ser"));
-//        load(new File("savetest.ser"));
-
+    public static void downloadTestData(File dir,int numOfBooks, Mutable<Double> progress) {
+        Thread bd = new BookDownloader(numOfBooks, dir, progress);
+        bd.start();
     }
 
     public static boolean checkBook(String name) {
@@ -67,12 +43,14 @@ class Interface {
         for (var key1 : bookStockHashes.keySet()) {
             for (var key2 : bookStockHashes.keySet()) {
                 if (!similarity.keySet().contains(new Pair<>(key1, key2))) {
+                    double contentSim = bookStockHashes.get(key1).minHashedContent.calcSimTo(bookStockHashes.get(key2).minHashedContent);
+                    double titleSim = bookStockHashes.get(key1).minHashedTitle.calcSimTo(bookStockHashes.get(key2).minHashedTitle);
                     similarity.put(
                             new Pair<>(key1, key2),
-                            new Pair<>(
-                                    bookStockHashes.get(key1).minHashedContent.calcSimTo(bookStockHashes.get(key2).minHashedContent),
-                                    bookStockHashes.get(key1).minHashedTitle.calcSimTo(bookStockHashes.get(key2).minHashedTitle)
-                            ));
+                            new Pair<>(contentSim, titleSim));
+                    similarity.put(
+                            new Pair<>(key2, key1),
+                            new Pair<>(contentSim, titleSim));
                 }
             }
         }
@@ -154,8 +132,8 @@ class Interface {
         return bookStockHashes;
     }
 
-    public static void parseDirectory(Mutable<Double> progress) {
-        BookDirectoryProcessor processor = new BookDirectoryProcessor(currentDir, progress, availableBooks);
+    public static void parseDirectory(File dir,Mutable<Double> progress) {
+        BookDirectoryProcessor processor = new BookDirectoryProcessor(dir, progress, availableBooks);
         processor.start();
         bookStockHashes = processor.result;
         while (availableBooks == null)

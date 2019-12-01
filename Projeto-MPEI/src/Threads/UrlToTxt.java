@@ -49,7 +49,7 @@ public class UrlToTxt extends Thread {
                 rd.close();
             }
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+            //ioe.printStackTrace();
         } finally {
             if (connection != null) {
                 connection.disconnect();
