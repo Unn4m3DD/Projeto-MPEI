@@ -3,7 +3,6 @@ package Tests;
 import modules.Hash;
 import modules.HashSeed;
 import modules.MinHash;
-import util.Environment;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -22,16 +21,22 @@ class MinHashTest {
 
     private static void testSimilarity() throws FileNotFoundException {
         File[] files = createFiles();
-        for(int seedSize=100; seedSize<250; seedSize+=50) {
+        for (int seedSize = 100; seedSize <= 250; seedSize += 50) {
+            System.out.println("Seed size: " + seedSize);
             double[] similarity = new double[files.length - 1];
             MinHash originalfile = getMinHash(files[0], seedSize);
             for (int i = 0; i < similarity.length; i++) {
                 similarity[i] = originalfile.calcSimTo(getMinHash(files[i + 1], seedSize)) * 100;
             }
-            for (int i = 0; i < similarity.length; i++) {
-                System.out.println("Similarity between OG file and " + ((i + 1) * 10) + ": " + similarity[i]);
-            }
+
             //TODO do the same but with jaccardindex
+            double[] jaccardIndex = new double[similarity.length];
+            for (int i = 0; i < jaccardIndex.length; i++) {
+                jaccardIndex[i] = MinHash.jaccardIndex(files[0], files[i + 1]) * 100;
+            }
+            for (int i = 0; i < similarity.length; i++) {
+                System.out.println("Similarity between first and " + (i + 1) + "th file: " + similarity[i] + "|| Jaccard index: " + jaccardIndex[i]);
+            }
         }
     }
 
@@ -41,6 +46,7 @@ class MinHashTest {
         while (fileReader.hasNext()) {
             sentence += fileReader.next();
         }
+        fileReader.close();
         var charArray = sentence.toCharArray();
         ArrayList<Character> charList = new ArrayList<>();
         for (int i = 0; i < charArray.length; i++) {
@@ -57,10 +63,14 @@ class MinHashTest {
         fileArr[0] = new File("Projeto-MPEI" + File.separator + "src" + File.separator + "Tests" + File.separator + "test" + File.separator + "test.txt");
         Scanner fileReader = new Scanner(fileArr[0]);
         String sentence = "";
-        while(fileReader.hasNext()){
-            sentence+=fileReader.next();
+        while (fileReader.hasNext()) {
+            sentence += fileReader.next();
         }
         fileSize = sentence.length();
+        fileReader.close();
+        PrintWriter rewrite = new PrintWriter(fileArr[0]);
+        rewrite.write(sentence);   //so the original file doesn't have blank spaces
+        rewrite.close();
 
         for (int i = 1; i <= 10; i++) {
             fileArr[i] = new File("Projeto-MPEI" + File.separator + "src" + File.separator + "Tests" + File.separator + "test" + File.separator + "test" + i * 10 + ".txt");
@@ -76,7 +86,7 @@ class MinHashTest {
 
     private static char randomChar() {
         Random r = new Random();
-        return  (char)(r.nextInt(26) + 'a');
+        return (char) (r.nextInt(57) + 'A');
     }
 }
 

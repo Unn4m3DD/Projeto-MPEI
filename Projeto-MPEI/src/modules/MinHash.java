@@ -1,14 +1,14 @@
 package modules;
 
-import util.Environment;
 import util.TimeThis;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.Serializable;
 import java.util.*;
 
 import static modules.Hash.hash;
 import static modules.Hash.hashSeed;
-import static util.Environment.*;
 
 public class MinHash implements Serializable {
     private int[] signature;
@@ -29,6 +29,50 @@ public class MinHash implements Serializable {
             signature[i] = min;
         }
         t.end();
+    }
+
+    public static double jaccardIndex(File firstFile, File secondFile) throws FileNotFoundException {
+        Scanner readFile = new Scanner(firstFile);
+        String sentence1 = "";
+        while (readFile.hasNext()) {
+            sentence1 += (readFile.next());
+        }
+        readFile.close();
+        Scanner readSecFile = new Scanner(secondFile);
+        String sentence2 = "";
+        while (readSecFile.hasNext()) {
+            sentence2 += readSecFile.next();
+        }
+        readSecFile.close();
+        return (double)sameCharacters(sentence1, sentence2) / union(sentence1, sentence2);
+    }
+
+    private static int union(String sentence1, String sentence2) {
+        Set <Character> sentenceSet = new TreeSet<>();
+        for(int i = 0; i < sentence1.length(); i++) {
+            sentenceSet.add(sentence1.charAt(i));
+        }
+
+        for(int i = 0; i < sentence2.length(); i++) {
+            sentenceSet.add(sentence2.charAt(i));
+        }
+
+        return sentenceSet.size();
+
+    }
+
+    private static int sameCharacters(String sentence1, String sentence2) {
+        Set<Character> sentence1Set = new TreeSet<>();
+        for(int i = 0; i < sentence1.length(); i++) {
+            sentence1Set.add(sentence1.charAt(i));
+        }
+
+        Set<Character> sentence2Set = new TreeSet<>();
+        for(int i = 0; i < sentence2.length(); i++) {
+            sentence2Set.add(sentence2.charAt(i));
+        }
+        sentence1Set.retainAll(sentence2Set);
+        return sentence1Set.size();
     }
 
 
