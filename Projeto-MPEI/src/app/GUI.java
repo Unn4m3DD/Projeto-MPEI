@@ -9,11 +9,13 @@ TODO 22/11/2019
 
 package app;
 
-import util.Book;
 import util.Mutable;
 import util.ProcessedBooksResult;
+import util.SimContainer;
+import util.TimeThis;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -21,6 +23,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 import static app.Interface.*;
 
@@ -90,7 +93,7 @@ class GUI extends JFrame implements ActionListener {
         if (e.getSource().equals(buttons.get("Return book")))
             returnBook();
         if (e.getSource().equals(buttons.get("All Similar Title")))
-            assert true;
+            allSimilarTitle();
         if (e.getSource().equals(buttons.get("Check book Availability")))
             assert true;
         if (e.getSource().equals(buttons.get("All Similar Content")))
@@ -104,7 +107,6 @@ class GUI extends JFrame implements ActionListener {
         if (e.getSource().equals(menuItems.get("Load Library")))
             loadLibrary();
     }
-
 
 
     private GUI(String windowHeader) throws IOException, ClassNotFoundException {
@@ -126,6 +128,12 @@ class GUI extends JFrame implements ActionListener {
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         (new GUI("Biblioteca")).setVisible(true);
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                TimeThis.printAllDelays();
+            }
+        });
     }
 
     private static void returnBook() {
@@ -421,14 +429,14 @@ class GUI extends JFrame implements ActionListener {
         window.add(textP, BorderLayout.NORTH);
 
         JPanel rightPanel = new JPanel();
-        DefaultListModel<ProcessedBooksResult> listModel = new DefaultListModel<>();
+        DefaultListModel<BookListItem> listModel = new DefaultListModel<>();
 
         for (var item : books) {
-            listModel.addElement(item);
+            listModel.addElement(new BookListItem("Title: <br>" + item, "", ""));
         }
-        JList<ProcessedBooksResult> display = new JList<>(listModel);
+        JList<BookListItem> display = new JList<>(listModel);
 
-        display.setCellRenderer(new BookListItem());
+        display.setCellRenderer(new BookListItemRenderer());
         display.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         JScrollPane scroll = new JScrollPane(display);
         scroll.setPreferredSize(new Dimension(450, 150));
@@ -456,53 +464,224 @@ class GUI extends JFrame implements ActionListener {
     }
 
     private void allSimilarContent() {
-//        var toShow = allSim();
-//        JFrame window = new JFrame();
-//        window.setLayout(new BorderLayout(0, 1));
-//
-//        //title sort of
-//        JLabel text = new JLabel(books.size() == 0 ? "Similar not titles found" : "Similar titles found:");
-//
-//        text.setFont(new Font("Arial", Font.BOLD, 25));
-//        var textP = new JPanel();
-//        text.setPreferredSize(new Dimension(400, 50));
-//        textP.add(text);
-//        window.add(textP, BorderLayout.NORTH);
-//
-//        JPanel rightPanel = new JPanel();
-//        DefaultListModel<ProcessedBooksResult> listModel = new DefaultListModel<>();
-//
-//        for (var item : books) {
-//            listModel.addElement(item);
-//        }
-//        JList<ProcessedBooksResult> display = new JList<>(listModel);
-//
-//        display.setCellRenderer(new BookListItem());
-//        display.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-//        JScrollPane scroll = new JScrollPane(display);
-//        scroll.setPreferredSize(new Dimension(450, 150));
-//        scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-//        rightPanel.add(scroll);
-//        window.add(rightPanel, BorderLayout.CENTER);
-//
-//        //button
-//        var okay = new JButton();
-//        okay.setText("OK");
-//        okay.addActionListener((e) -> {
-//            window.dispose();
-//        });
-//        var okayP = new JPanel();
-//        okayP.add(okay);
-//        window.add(okayP, BorderLayout.SOUTH);
-//
-//        //JFrame settings
-//        window.setSize(500, 300);
-//        int x = (screenSize.width - window.getWidth()) / 2;
-//        int y = (screenSize.height - window.getHeight()) / 2;
-//        window.setLocation(x, y);
-//        window.setVisible(true);
-//        window.setResizable(false);
+        Mutable<HashMap<String, List<SimContainer>>> toShow = new Mutable<>(allSimContent(.8));
+        JFrame window = new JFrame("Similar Content");
+        window.setLayout(new BorderLayout(0, 1));
+
+
+        JPanel list1 = new JPanel();
+        DefaultListModel<BookListItem> listModel1 = new DefaultListModel<>();
+
+        for (var item : toShow.get().keySet()) {
+            int size = toShow.get().get(item).size();
+            if (size > 0)
+                listModel1.addElement(new BookListItem("Title: <br>" + item, "count: " + size, item));
+        }
+        JList<BookListItem> display1 = new JList<>(listModel1);
+
+        display1.setCellRenderer(new BookListItemRenderer());
+        display1.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        JScrollPane scroll1 = new JScrollPane(display1);
+        scroll1.setPreferredSize(new Dimension(400, 550));
+        scroll1.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        list1.add(scroll1);
+        window.add(list1, BorderLayout.WEST);
+
+        JPanel middle = new JPanel(new BorderLayout());
+
+        JLabel text = new JLabel("Similar contents found:");
+        text.setFont(new Font("Arial", Font.BOLD, 25));
+        var textP = new JPanel(new BorderLayout());
+        text.setPreferredSize(new Dimension(400, 50));
+        textP.add(text, BorderLayout.CENTER);
+        middle.add(textP, BorderLayout.NORTH);
+
+
+        JPanel thrPanel = new JPanel(new BorderLayout());
+
+        JLabel thrTxt = new JLabel("Insert a threshold:");
+        thrPanel.add(thrTxt, BorderLayout.NORTH);
+
+        JPanel thrTxtBoxPanel = new JPanel();
+        JTextField thrTxtBox = new JTextField("0.8");
+        thrTxtBox.setHorizontalAlignment(0);
+        thrTxtBox.setPreferredSize(new Dimension(100, 25));
+        thrTxtBox.setSize(new Dimension(100, 25));
+        thrTxtBoxPanel.add(thrTxtBox);
+
+        thrPanel.add(thrTxtBoxPanel, BorderLayout.CENTER);
+
+        JPanel thrBtnPanel = new JPanel();
+        JButton thrBtn = new JButton("Calculate");
+        thrBtnPanel.add(thrBtn);
+        thrBtn.addActionListener((e) -> {
+            try {
+                double thr = Double.parseDouble(thrTxtBox.getText());
+                if (thr < 0 || thr > 1) throw new Exception();
+                toShow.set(allSimContent(thr));
+                listModel1.removeAllElements();
+                if (toShow.get().size() > 0) {
+                    for (var item : toShow.get().keySet()) {
+                        int size = toShow.get().get(item).size();
+                        if (size > 0)
+                            listModel1.addElement(new BookListItem("Title: <br>" + item, "count: " + size, item));
+                    }
+                }
+            } catch (Exception exc) {
+                JOptionPane.showMessageDialog(null, "The inserted value is not valid");
+                exc.printStackTrace();
+            }
+        });
+
+        thrTxtBoxPanel.add(thrBtnPanel);
+        thrPanel.setPreferredSize(new Dimension(200, 200));
+        middle.add(thrPanel, BorderLayout.CENTER);
+        middle.add(new JPanel(), BorderLayout.SOUTH);
+
+        window.add(middle, BorderLayout.CENTER);
+
+        JPanel list2 = new JPanel();
+        DefaultListModel<BookListItem> listModel2 = new DefaultListModel<>();
+
+        JList<BookListItem> display2 = new JList<>(listModel2);
+
+        display2.setCellRenderer(new BookListItemRenderer());
+        display2.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        JScrollPane scroll2 = new JScrollPane(display2);
+        scroll2.setPreferredSize(new Dimension(400, 550));
+        scroll2.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        list2.add(scroll2);
+        window.add(list2, BorderLayout.EAST);
+
+        display1.addListSelectionListener((e) -> {
+            listModel2.removeAllElements();
+            try {
+                for (var item : toShow.get().get(display1.getSelectedValue().name)) {
+                    listModel2.addElement(new BookListItem("Title: <br>" + item.name, "Similarity: " + item.sim, item.name));
+                }
+            } catch (Exception exp) {
+            }
+        });
+
+        //JFrame settings
+        window.setSize(1200, 600);
+        int x = (screenSize.width - window.getWidth()) / 2;
+        int y = (screenSize.height - window.getHeight()) / 2;
+        window.setLocation(x, y);
+        window.setVisible(true);
+        window.setResizable(false);
     }
+
+    private void allSimilarTitle() {
+        Mutable<HashMap<String, List<SimContainer>>> toShow = new Mutable<>(allSimTitle(.8));
+        JFrame window = new JFrame("Similar Content");
+        window.setLayout(new BorderLayout(0, 1));
+
+
+        JPanel list1 = new JPanel();
+        DefaultListModel<BookListItem> listModel1 = new DefaultListModel<>();
+
+        for (var item : toShow.get().keySet()) {
+            int size = toShow.get().get(item).size();
+            if (size > 0)
+                listModel1.addElement(new BookListItem("Title: <br>" + item, "count: " + size, item));
+        }
+        JList<BookListItem> display1 = new JList<>(listModel1);
+
+        display1.setCellRenderer(new BookListItemRenderer());
+        display1.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        JScrollPane scroll1 = new JScrollPane(display1);
+        scroll1.setPreferredSize(new Dimension(400, 550));
+        scroll1.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        list1.add(scroll1);
+        window.add(list1, BorderLayout.WEST);
+
+        JPanel middle = new JPanel(new BorderLayout());
+
+        JLabel text = new JLabel("Similar titles found:");
+        text.setFont(new Font("Arial", Font.BOLD, 25));
+        var textP = new JPanel(new BorderLayout());
+        text.setPreferredSize(new Dimension(400, 50));
+        textP.add(text, BorderLayout.CENTER);
+        middle.add(textP, BorderLayout.NORTH);
+
+
+        JPanel thrPanel = new JPanel(new BorderLayout());
+
+        JLabel thrTxt = new JLabel("Insert a threshold:");
+        thrPanel.add(thrTxt, BorderLayout.NORTH);
+
+        JPanel thrTxtBoxPanel = new JPanel();
+        JTextField thrTxtBox = new JTextField("0.8");
+        thrTxtBox.setHorizontalAlignment(0);
+        thrTxtBox.setPreferredSize(new Dimension(100, 25));
+        thrTxtBox.setSize(new Dimension(100, 25));
+        thrTxtBoxPanel.add(thrTxtBox);
+
+        thrPanel.add(thrTxtBoxPanel, BorderLayout.CENTER);
+
+        JPanel thrBtnPanel = new JPanel();
+        JButton thrBtn = new JButton("Calculate");
+        thrBtnPanel.add(thrBtn);
+        thrBtn.addActionListener((e) -> {
+            try {
+                double thr = Double.parseDouble(thrTxtBox.getText());
+                if (thr < 0 || thr > 1) throw new Exception();
+                toShow.set(allSimTitle(thr));
+                listModel1.removeAllElements();
+                if (toShow.get().size() > 0) {
+                    for (var item : toShow.get().keySet()) {
+                        int size = toShow.get().get(item).size();
+                        if (size > 0)
+                            listModel1.addElement(new BookListItem("Title: <br>" + item, "count: " + size, item));
+                    }
+                }
+            } catch (Exception exc) {
+                JOptionPane.showMessageDialog(null, "The inserted value is not valid");
+                exc.printStackTrace();
+            }
+        });
+
+        thrTxtBoxPanel.add(thrBtnPanel);
+        thrPanel.setPreferredSize(new Dimension(200, 200));
+        middle.add(thrPanel, BorderLayout.CENTER);
+        middle.add(new JPanel(), BorderLayout.SOUTH);
+
+        window.add(middle, BorderLayout.CENTER);
+
+        JPanel list2 = new JPanel();
+        DefaultListModel<BookListItem> listModel2 = new DefaultListModel<>();
+
+        JList<BookListItem> display2 = new JList<>(listModel2);
+
+        display2.setCellRenderer(new BookListItemRenderer());
+        display2.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        JScrollPane scroll2 = new JScrollPane(display2);
+        scroll2.setPreferredSize(new Dimension(400, 550));
+        scroll2.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        list2.add(scroll2);
+        window.add(list2, BorderLayout.EAST);
+
+        display1.addListSelectionListener((e) -> {
+            listModel2.removeAllElements();
+            try {
+                for (var item : toShow.get().get(display1.getSelectedValue().name)) {
+                    listModel2.addElement(new BookListItem("Title: <br>" + item.name, "Similarity: " + item.sim, item.name));
+                }
+            } catch (Exception exp) {
+
+            }
+        });
+
+        //JFrame settings
+        window.setSize(1200, 600);
+        int x = (screenSize.width - window.getWidth()) / 2;
+        int y = (screenSize.height - window.getHeight()) / 2;
+        window.setLocation(x, y);
+        window.setVisible(true);
+        window.setResizable(false);
+    }
+
     private void parsePopupDirectory() {
         JFileChooser fileChooser = new JFileChooser(".");
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -581,5 +760,6 @@ class GUI extends JFrame implements ActionListener {
         }
         updateButtonClickability();
     }
+
 }
 

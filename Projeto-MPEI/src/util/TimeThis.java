@@ -13,7 +13,7 @@ public class TimeThis {
     private long start;
     private String s;
     private String opc;
-    public static boolean currentlyTiming;
+    public static boolean currentlyTiming = true;
     private static boolean verbose;
     private static HashMap<String, ArrayList<Integer>> allTimes = new HashMap<>();
 

@@ -8,10 +8,9 @@ import modules.MinHash;
 import util.*;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.security.KeyPair;
+import java.sql.Time;
+import java.util.*;
 
 import static util.Environment.titleShingleSize;
 
@@ -22,9 +21,12 @@ class Interface {
     public static CountFilter stock;
     public static HashMap<String, LSH> bookStockFingerprints = new HashMap<>();
 
+    public static HashMap<Pair<String, String>, Pair<Double, Double>> similarity = new HashMap<>();
+
     public static File getCurrentDirectory() {
         return currentDir;
     }
+
     public static File setCurrentDirectory(File dir) {
         return currentDir = dir;
     }
@@ -47,7 +49,6 @@ class Interface {
             }
         save(new File("english.ser"));
 //        load(new File("savetest.ser"));
-        System.out.println(allSim());
 
     }
 
@@ -61,17 +62,52 @@ class Interface {
         }
     }
 
-    public static HashMap<ProcessedBooksResult, List<ProcessedBooksResult>> allSim() {
-        // TODO: 27/11/2019 Refazer isto pq está só estupido
-//        generateFingerprint();
-        HashMap<ProcessedBooksResult, List<ProcessedBooksResult>> result = new HashMap<>();
+    private static void allSim() {
+        TimeThis t = new TimeThis(similarity.keySet().size() > 0 ? "Look Up All Similarities" : "Calc All Similarities", "e");
         for (var key1 : bookStockHashes.keySet()) {
-            result.put(bookStockHashes.get(key1), new LinkedList<>());
             for (var key2 : bookStockHashes.keySet()) {
-                if (!result.keySet().contains(key2))
-                    if (0.4 < bookStockHashes.get(key1).minHashedContent.calcSimTo(bookStockHashes.get(key2).minHashedContent) && (!key1.equals(key2))) {
-                        result.get(bookStockHashes.get(key1)).add(bookStockHashes.get(key2));
-                    }
+                if (!similarity.keySet().contains(new Pair<>(key1, key2))) {
+                    similarity.put(
+                            new Pair<>(key1, key2),
+                            new Pair<>(
+                                    bookStockHashes.get(key1).minHashedContent.calcSimTo(bookStockHashes.get(key2).minHashedContent),
+                                    bookStockHashes.get(key1).minHashedTitle.calcSimTo(bookStockHashes.get(key2).minHashedTitle)
+                            ));
+                }
+            }
+        }
+        t.end();
+    }
+
+    public static HashMap<String, List<SimContainer>> allSimContent(double thr) {
+        if (similarity.keySet().size() == 0)
+            allSim();
+        HashMap<String, List<SimContainer>> result = new HashMap<>();
+        for (var key1 : bookStockHashes.keySet()) {
+            result.put(bookStockHashes.get(key1).name, new LinkedList<>());
+            for (var key2 : bookStockHashes.keySet()) {
+                double sim = similarity.get(new Pair<>(key1, key2)).elem1;
+                if (thr < sim && (!key1.equals(key2))) {
+                    result.get(bookStockHashes.get(key1).name).add(new SimContainer(bookStockHashes.get(key2).name, sim));
+                }
+
+            }
+        }
+        return result;
+    }
+
+    public static HashMap<String, List<SimContainer>> allSimTitle(double thr) {
+        if (similarity.keySet().size() == 0)
+            allSim();
+        HashMap<String, List<SimContainer>> result = new HashMap<>();
+        for (var key1 : bookStockHashes.keySet()) {
+            result.put(bookStockHashes.get(key1).name, new LinkedList<>());
+            for (var key2 : bookStockHashes.keySet()) {
+                double sim = similarity.get(new Pair<>(key1, key2)).elem2;
+                if (thr < sim && (!key1.equals(key2))) {
+                    result.get(bookStockHashes.get(key1).name).add(new SimContainer(bookStockHashes.get(key2).name, sim));
+                }
+
             }
         }
         return result;
