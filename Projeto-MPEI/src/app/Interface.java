@@ -8,8 +8,6 @@ import modules.MinHash;
 import util.*;
 
 import java.io.*;
-import java.security.KeyPair;
-import java.sql.Time;
 import java.util.*;
 
 import static util.Environment.titleShingleSize;
@@ -100,7 +98,7 @@ class Interface {
 
         MinHash nameMinHash =
                 new MinHash(
-                        MinHash.shinglesFromCharArr(list, titleShingleSize)
+                        MinHash.shinglesHashCodeFromCharArr(list, titleShingleSize)
                 );
         for (var item : bookStockHashes.values()) {
             if (item.minHashedTitle.calcSimTo(nameMinHash) >= thr) {

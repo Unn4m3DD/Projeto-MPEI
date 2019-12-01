@@ -27,7 +27,7 @@ public class BookContentProcessor extends Thread {
             Book b = toProcessContent.poll();
             while (b != null) {
                 TimeThis t = new TimeThis("1 Content MinHash", "v");
-                result.get(b.getName()).minHashedContent = new MinHash(MinHash.shinglesFromCharArr(b.getContent(), contentShingleSize));
+                result.get(b.getName()).minHashedContent = new MinHash(MinHash.shinglesHashCodeFromCharArr(b.getContent(), contentShingleSize));
                 b = toProcessContent.poll();
                 t.end();
             }

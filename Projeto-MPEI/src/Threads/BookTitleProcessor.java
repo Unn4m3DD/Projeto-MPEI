@@ -36,7 +36,7 @@ public class BookTitleProcessor extends Thread {
 
             Book b = toProcessTitle.poll();
             while (b != null) {
-                MinHash minHashedTitle = new MinHash(MinHash.shinglesFromCharArr(b.getTitle(), titleShingleSize));
+                MinHash minHashedTitle = new MinHash(MinHash.shinglesHashCodeFromCharArr(b.getTitle(), titleShingleSize));
 
                 StringBuilder sb = new StringBuilder();
                 for (var c : b.getTitle()) {

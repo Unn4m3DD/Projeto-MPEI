@@ -1,5 +1,6 @@
 package modules;
 
+import util.Book;
 import util.TimeThis;
 
 import java.io.File;
@@ -31,20 +32,21 @@ public class MinHash implements Serializable {
         t.end();
     }
 
-    public static double jaccardIndex(File firstFile, File secondFile) throws FileNotFoundException {
-        Scanner readFile = new Scanner(firstFile);
-        String sentence1 = "";
-        while (readFile.hasNext()) {
-            sentence1 += (readFile.next());
-        }
-        readFile.close();
-        Scanner readSecFile = new Scanner(secondFile);
-        String sentence2 = "";
-        while (readSecFile.hasNext()) {
-            sentence2 += readSecFile.next();
-        }
-        readSecFile.close();
-        return (double)sameCharacters(sentence1, sentence2) / union(sentence1, sentence2);
+    public static double jaccardIndex(File file1, File file2, int shingleSize) throws FileNotFoundException {
+        var characterList1 = shinglesFromCharArray((new Book(file1)).getContent(), shingleSize);
+        var characterList2 = shinglesFromCharArray((new Book(file2)).getContent(), shingleSize);
+
+        HashSet<String> union = new HashSet<>();
+        union.addAll(characterList1);
+        union.addAll(characterList2);
+        HashSet<String> set1 = new HashSet<>();
+        set1.addAll(characterList1);
+        HashSet<String> set2 = new HashSet<>();
+        set2.addAll(characterList2);
+        set2.retainAll(set1);
+        HashSet<String> intersect = set2;
+
+        return (double)intersect.size() / union.size();
     }
 
     private static int union(String sentence1, String sentence2) {
@@ -84,7 +86,7 @@ public class MinHash implements Serializable {
         return 1 - (double) counter / (double) signature.length;
     }
 
-    public static List<Integer> shinglesFromCharArr(ArrayList<Character> charArr, int size) {
+    public static List<Integer> shinglesHashCodeFromCharArr(ArrayList<Character> charArr, int size) {
         TimeThis t = new TimeThis("Shingle Creation", "v");
         ArrayList<Integer> result = new ArrayList<>(charArr.size());
         for (var i = 0; i + size < charArr.size(); i++) {
@@ -93,6 +95,21 @@ public class MinHash implements Serializable {
                 toAdd.append(charArr.get(i + j));
             }
             result.add(toAdd.toString().hashCode());
+        }
+        t.end();
+        return result;
+    }
+
+    public static List<String> shinglesFromCharArray(ArrayList<Character> charArr, int size) {
+        TimeThis t = new TimeThis("Shingle Creation", "v");
+        ArrayList<String> result = new ArrayList<>(charArr.size());
+//        ArrayList<Integer> result = new ArrayList<>();
+        for (var i = 0; i + size < charArr.size(); i++) {
+            StringBuilder toAdd = new StringBuilder();
+            for (var j = 0; j < size; j++) {
+                toAdd.append(charArr.get(i + j));
+            }
+            result.add(toAdd.toString());
         }
         t.end();
         return result;
