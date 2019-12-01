@@ -1,6 +1,5 @@
 package Tests;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
 
@@ -9,7 +8,7 @@ import static util.Environment.numberOfHashesForMinHash;
 
 
 public class HashTest {
-    private static int numOfHashes = numberOfHashesForMinHash, testWeight = 1000000;
+    private static int testWeight = 1000000;
     private static double accuracy = 0.001;
 
     /*
@@ -17,11 +16,11 @@ public class HashTest {
      and if different hash functions map the same value do distinct number
     */
     public static void main(String[] args) {
-        //test1();
-        test2();
+        hashTest();
+        dispTest();
     }
 
-    public static void test1() {
+    public static void hashTest() {
         System.out.printf("Iniciando teste das funções de hash ");
         double totalError = 0;
         for (int x = 1; x < testWeight; x++) {
@@ -35,84 +34,65 @@ public class HashTest {
             HashSet<Integer>[] hashes = new HashSet[6];
             for (int i = 0; i < ns.length; i++) {
                 hashes[i] = new HashSet<>();
-                for (int j = 0; j < numOfHashes; j++) {
+                for (int j = 0; j < numberOfHashesForMinHash; j++) {
                     hashes[i].add(hash(ns[i], j));
                 }
             }
             double err = 0;
             for (int i = 0; i < ns.length; i++) {
-                if (hashes[i].size() != numOfHashes) err++;
+                if (hashes[i].size() != numberOfHashesForMinHash) err++;
             }
             if ((x) % (testWeight / 10) == 0)
                 System.out.printf((double) x / testWeight + ", ");
-            totalError += ((double) err / numOfHashes);
+            totalError += ((double) err / numberOfHashesForMinHash);
         }
         System.out.println();
         totalError /= testWeight;
         if (totalError > accuracy)
             System.out.println("Erro no teste da função de hash");
-        if (totalError > accuracy)
+        if (totalError < accuracy)
             System.out.println("Passou!");
     }
 
-    public static void test2() {
-        //TODO revamp this whole mess
-        int values = Integer.MAX_VALUE / 100;
-        int leftBound = Integer.MIN_VALUE/100;  //numbers were changed because of overflow problems
-        int rightBound = Integer.MAX_VALUE/100;
-        //long totalSize = rightBound + Math.abs(leftBound);
-        int maxElementsSubSections = 100000;
-        long numberOfDivisions = (long) Math.ceil(values / maxElementsSubSections) +1;  //if i take this +1 out this wont work
-        var divisions = new int[(int) numberOfDivisions][maxElementsSubSections];
-        var hashes = new int[values];
-        int div = 0;
-        int sub = 0;
-        for (int i = 0; i < values; i++) {
-            Random generator = new Random();
-            var hash = (hash(generator.nextInt(), 3));
-            //hashes[i] = hash;
-            if (sub < maxElementsSubSections) {
-                divisions[div][sub] = hash;
-                sub++;
-            } else if (sub == maxElementsSubSections) {
-                sub = 0;
-                div++;
-            }
-        }
-        int[] mean = new int[(int) numberOfDivisions];
-        for (int i = 0; i < numberOfDivisions; i++) {
-            int sum = 0;
-            for (int j = 0; j < maxElementsSubSections; j++) {
-                sum += divisions[i][j];
-            }
-            mean[i] = (int) (sum / maxElementsSubSections);
-        }
-        int[][] minMax = new int[(int) numberOfDivisions][2];
-        for (int i = 0; i < numberOfDivisions; i++) {
-            int min = (int) divisions[i][0];
-            int max = (int) divisions[i][0];
-            for (int j = 1; j < maxElementsSubSections; j++) {
-                if (divisions[i][j] > max) {
-                    max = (int) divisions[i][j];
+    public static void dispTest() {
+        int values = 200;//Integer.MAX_VALUE / 1;
+        int numberOfDivisions = (int) Math.pow(2, 16);
+        int divisionSize = 2 * (Integer.MAX_VALUE / numberOfDivisions);
+        var divisions = new int[numberOfDivisions];
+        Random generator = new Random();
+        for (int j = 0; j < 10; j++) {
+            System.out.println("A iniciar o teste de dispersão da hash numero "+(j+1));
+            int hashNumber = (int) 3;//(Math.random() * numberOfHashesForMinHash);
+            for (int i = 0; i < values; i++) {
+                int hash = (hash(generator.nextInt(), hashNumber));
+                for (int k = 0; k < divisions.length; k++) {
+                    if (hash <= (Integer.MIN_VALUE + ((k + 1) * divisionSize))) {
+                        divisions[k]++;
+                        break;
+                    }
                 }
-                if (divisions[i][j] < min) {
-                    min = (int) divisions[i][j];
-                }
+                if ((i) % (values / 10) == 0)
+                    System.out.printf((double) i / values + ", ");
             }
-            minMax[i][0] = min;
-            minMax[i][1] = max;
-        }
 
-        var difference = new int[(int) numberOfDivisions];
-        for (int i = 0; i < numberOfDivisions; i++) {
-            difference[i] = minMax[i][1] - minMax[i][0]; // max - min -> final - inicial
-        }
+            double avg = 0;
 
-        var divergences = new int[difference.length];
-        for (int i = 0; i < divergences.length; i++) {
-            divergences[i] = difference[i]/ mean[i];
-        }
+            for (int i = 0; i < numberOfDivisions; i++) {
+                avg += ((double) divisions[i] / numberOfDivisions);
+            }
 
-        System.out.println(Arrays.toString(divergences));
+            long variance = 0;
+            for (int i = 0; i < divisions.length; i++) {
+                variance += (Math.pow(divisions[i] - avg, 2) / divisions.length);
+            }
+            int stdDev = (int) Math.sqrt((double) variance);
+            double dist = (double) stdDev / values;
+            System.out.println("Distribução: " + dist);
+            double threshold = 3;
+            if (dist < threshold)
+                System.out.println("Teste passado!");
+            else
+                System.out.println("Hash mal distribuida");
+        }
     }
 }
