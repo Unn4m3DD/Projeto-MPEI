@@ -18,7 +18,7 @@ public class Book {
         try (Scanner s = new Scanner(f)) {
             while (s.hasNextLine()) {
                 String c_line = s.nextLine();
-                if (!titleFetched && c_line.split(":")[0].equals("Title")) {
+                if (!titleFetched && c_line.split(":")[0].equals("Title") && c_line.split(":").length > 1) {
                     for (var c : c_line.split(":")[1].trim().toCharArray()) {
                         title.add(c);
                     }

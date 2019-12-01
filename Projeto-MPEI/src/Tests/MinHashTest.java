@@ -4,7 +4,6 @@ import modules.Hash;
 import modules.HashSeed;
 import modules.MinHash;
 import util.Book;
-import util.TimeThis;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,42 +14,74 @@ import java.util.Scanner;
 class MinHashTest {
     public static int shingleSize = 8;
     public static int fileSize;
-    public double accuracy = 0.05;
+    public static double accuracy = 0.05;
+    public static int optimalK = Integer.MAX_VALUE;
 
     public static void main(String[] args) throws FileNotFoundException {
-        testSimilarity();
+        optimalNumberOfHashes();
+        optimalSimilarity();
+        //checkar se os valores da similarity e jaccard sao minimamente decetnes
     }
 
-    private static void testSimilarity() throws FileNotFoundException {
+    private static void optimalSimilarity() throws FileNotFoundException {
+        System.out.println("Initializing test for minhash quality");
+        File [] files = createFiles(1000);
+        double[] similarity = new double[files.length -1];
+        MinHash originalfile = getMinHash(files[0], optimalK);
+        for (int i = 0; i < similarity.length; i++) {
+            similarity[i] = originalfile.calcSimTo(getMinHash(files[i + 1], optimalK));
+            if (i % similarity.length == 0)
+                System.out.print(".");
+        }
+        double[] jaccardIndex = new double[similarity.length];
+        for (int i = 0; i < jaccardIndex.length; i++) {
+            jaccardIndex[i] = MinHash.jaccardIndex(files[0], files[i + 1], shingleSize);
+            if (i % similarity.length == 0)
+                System.out.print(".");
+        }
+        System.out.println(".");
+
+        double sum = 0;
+        for (int i = 0; i < similarity.length; i++) {
+            sum += Math.abs(similarity[i] - jaccardIndex[i]);
+        }
+        sum /= similarity.length;
+        if (sum < accuracy)
+            System.out.println("Test for difference between Jaccard index and minhash similarity passed!");
+        else
+            System.out.println("Jaccard index and minhash calculations are too far apart");
+    }
+
+    private static void optimalNumberOfHashes() throws FileNotFoundException {
+        System.out.println("Initializing test for optimal number of hashes...");
         File[] files = createFiles(100);
-        for (int seedSize = 100; seedSize <= 250; seedSize += 50) {
-            System.out.println("Seed size: " + seedSize);
+        for (int seedSize = 50; seedSize <= 250; seedSize += 50) {
             double[] similarity = new double[files.length - 1];
             MinHash originalfile = getMinHash(files[0], seedSize);
-            TimeThis t4 = new TimeThis("Calc all minhash");
             for (int i = 0; i < similarity.length; i++) {
-                TimeThis t3 = new TimeThis("Calc single minhash");
                 similarity[i] = originalfile.calcSimTo(getMinHash(files[i + 1], seedSize));
-                t3.end();
+                if (i % similarity.length == 0)
+                    System.out.print(".");
             }
-            t4.end();
 
             double[] jaccardIndex = new double[similarity.length];
-            TimeThis t2 = new TimeThis("Calc all jaccard");
             for (int i = 0; i < jaccardIndex.length; i++) {
-                TimeThis t = new TimeThis("Calc single jaccard");
                 jaccardIndex[i] = MinHash.jaccardIndex(files[0], files[i + 1], shingleSize);
-                t.end();
+                if (i % similarity.length == 0)
+                    System.out.print(".");
             }
-            t2.end();
+            System.out.println(".");
 
-            TimeThis.printAllDelays();
             double sum = 0;
             for (int i = 0; i < similarity.length; i++) {
-                sum+=Math.abs(similarity[i]- jaccardIndex[i]);
+                sum += Math.abs(similarity[i] - jaccardIndex[i]);
             }
-            sum/= similarity.length;
-            System.out.println(sum);
+            sum /= similarity.length;
+            if (sum < accuracy) {
+                System.out.println("Test for K = " + seedSize + " passed!");
+                optimalK = seedSize;
+            } else
+                System.out.println("K= " + seedSize + "is not optimal");
         }
     }
 
@@ -61,7 +92,6 @@ class MinHashTest {
     }
 
     private static File[] createFiles(int numFiles) throws FileNotFoundException {
-        TimeThis t = new TimeThis("Create Files");
         File[] fileArr = new File[numFiles + 1];
         fileArr[0] = new File("Projeto-MPEI" + File.separator + "src" + File.separator + "Tests" + File.separator + "test" + File.separator + "test.txt");
         Scanner fileReader = new Scanner(fileArr[0]);
@@ -74,7 +104,6 @@ class MinHashTest {
         double base = Math.log(numFiles);
 
         for (int i = 1; i <= numFiles; i++) {
-            TimeThis t2 = new TimeThis("Create Single File");
             fileArr[i] = new File("Projeto-MPEI" + File.separator + "src" + File.separator + "Tests" + File.separator + "test" + File.separator + "test" + i * 10 + ".txt");
             PrintWriter writeFiles = new PrintWriter(fileArr[i]);
             for (int x = 0; x < fileSize; x++) {
@@ -82,9 +111,7 @@ class MinHashTest {
 
             }
             writeFiles.close();
-            t2.end();
         }
-        t.end();
         return fileArr;
     }
 

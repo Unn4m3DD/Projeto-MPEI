@@ -108,7 +108,7 @@ class GUI extends JFrame implements ActionListener {
 
     private GUI(String windowHeader) throws IOException, ClassNotFoundException {
         super(windowHeader);
-        load(new File("./save.ser"));
+        //load(new File("./save.ser"));
         initializeButtonsAndPanels();
         setLayout(new GridLayout(3, 3));
         Dimension windowSize = new Dimension(1000, 600);
