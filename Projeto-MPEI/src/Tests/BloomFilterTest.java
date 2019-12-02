@@ -11,16 +11,17 @@ import java.util.Set;
 class BloomFilterTest {
     private static int testWeight = 100;
     private static double accuracy = .1;
+    private static int n;
 
     public static void main(String[] args) {
-//        optimalKFullTest();
-        BloomFilter b = BloomFilter.fromFile("mises.txt");
-//        falseNegativeTest(b);
-//        falsePositiveFullTest(b);
-        optimalNtest();
+        optimalKFullTest();
+        n = optimalNtest();
+        BloomFilter b = BloomFilter.fromFile("mises.txt", n);
+        falseNegativeTest(b);
+        falsePositiveFullTest(b);
     }
 
-    private static void optimalNtest() {
+    private static int optimalNtest() {
         int inputDataSize = 1000;
         System.out.println("Teste de N optimo em execução: ");
         for (int i = 1; true; i++) {
@@ -29,7 +30,7 @@ class BloomFilterTest {
                 double result = falsePositiveTest(dataSetFilter);
                 if (Math.abs(result) < .02) {
                     System.out.println("N minimo para erro < 0.1 : " + i);
-                    break;
+                    return i;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -68,12 +69,12 @@ class BloomFilterTest {
 
     private static double falsePositiveTest(BloomFilter b) {
         int count = 0;
-        for (var i = 0; i < 10000; i++) {
+        for (var i = 0; i < 1000000; i++) {
             boolean a = b.isElement(randomString());
             if (b.isElement(randomString())) count++;
         }
 
-        return (double) count / 10000;
+        return (double) count / 1000000;
     }
 
     private static void falseNegativeTest(BloomFilter b) {

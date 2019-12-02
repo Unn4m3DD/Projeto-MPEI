@@ -17,7 +17,8 @@ public class CountFilter implements Serializable {
 
     public void addElement(String elem) {
         for (var i = 0; i < k; i++) {
-            filter[Math.abs(hash(elem.hashCode(), i)) % n]++;
+            if (filter[Math.abs(hash(elem.hashCode(), i)) % n] < Integer.MAX_VALUE)
+                filter[Math.abs(hash(elem.hashCode(), i)) % n]++;
         }
     }
 
@@ -43,9 +44,13 @@ public class CountFilter implements Serializable {
         return filter;
     }
 
-    public void remElement(String elem) {
+    public boolean remElement(String elem) {
+        for (var i = 0; i < k; i++)
+            if (filter[Math.abs(hash(elem.hashCode(), i)) % n] == 0)
+                return false;
         for (var i = 0; i < k; i++) {
             filter[Math.abs(hash(elem.hashCode(), i)) % n]--;
         }
+        return true;
     }
 }

@@ -1,24 +1,19 @@
-/*
-TODO 22/11/2019
- >fazer as janelas que faltam
- >linkar as janelas
- >actually pôr as funções
 
-*/
 
 
 package app;
 
 import modules.MinHash;
-import util.*;
+import util.Mutable;
+import util.ProcessedBooksResult;
+import util.SimContainer;
+import util.TimeThis;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +21,10 @@ import java.util.List;
 import static app.Interface.*;
 import static util.Environment.contentShingleSize;
 
+// TODO: 02/12/2019 adicionar botão de adicionar e remover livros
+// TODO: 02/12/2019 adicionar verificação do método parse directory
+// TODO: 02/12/2019 adicionar pasta container para download de dados
+// TODO: 02/12/2019 adicionar tool que chama função de teste
 /* D:\dev\Projeto-MPEI\books\Spanish */
 class GUI extends JFrame implements ActionListener {
     static Toolkit toolkit = Toolkit.getDefaultToolkit();

@@ -36,7 +36,7 @@ public class BloomFilter implements Serializable {
         return optK == 0 ? 1 : optK;
     }
 
-    public static BloomFilter fromFile(String fName) {
+    public static BloomFilter fromFile(String fName, int n) {
         File book = new File(fName);
         Set<String> wordSet = new HashSet<>();
         try (Scanner k = new Scanner(book)) {
@@ -46,7 +46,7 @@ public class BloomFilter implements Serializable {
         } catch (Exception e) {
             System.out.println("Runtime Error: " + e.toString());
         }
-        var b = new BloomFilter(wordSet.size() * 4, BloomFilter.optimalK(wordSet.size() * 4, wordSet.size()));
+        var b = new BloomFilter(wordSet.size() * n, BloomFilter.optimalK(wordSet.size() * n, wordSet.size()));
         for (var elem : wordSet) {
             b.addElement(elem);
         }

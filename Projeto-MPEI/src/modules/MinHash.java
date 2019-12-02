@@ -4,9 +4,10 @@ import util.Book;
 import util.TimeThis;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 import static modules.Hash.hash;
 import static modules.Hash.hashSeed;
@@ -48,35 +49,6 @@ public class MinHash implements Serializable {
 
         return (double) intersect.size() / union.size();
     }
-
-    private static int union(String sentence1, String sentence2) {
-        Set<Character> sentenceSet = new TreeSet<>();
-        for (int i = 0; i < sentence1.length(); i++) {
-            sentenceSet.add(sentence1.charAt(i));
-        }
-
-        for (int i = 0; i < sentence2.length(); i++) {
-            sentenceSet.add(sentence2.charAt(i));
-        }
-
-        return sentenceSet.size();
-
-    }
-
-    private static int sameCharacters(String sentence1, String sentence2) {
-        Set<Character> sentence1Set = new TreeSet<>();
-        for (int i = 0; i < sentence1.length(); i++) {
-            sentence1Set.add(sentence1.charAt(i));
-        }
-
-        Set<Character> sentence2Set = new TreeSet<>();
-        for (int i = 0; i < sentence2.length(); i++) {
-            sentence2Set.add(sentence2.charAt(i));
-        }
-        sentence1Set.retainAll(sentence2Set);
-        return sentence1Set.size();
-    }
-
 
     public double calcSimTo(MinHash m) {
         int counter = 0;
