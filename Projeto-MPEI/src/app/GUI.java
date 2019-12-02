@@ -811,6 +811,7 @@ class GUI extends JFrame implements ActionListener {
         window.setResizable(false);
     }
 
+
     private void jaccardSim() {
         JOptionPane.showMessageDialog(this, "Select 2 files to compare");
         JFileChooser fileChooser = new JFileChooser(".");

@@ -33,7 +33,9 @@ class Interface {
         for (var key1 : bookStockHashes.keySet()) {
             for (var key2 : bookStockHashes.keySet()) {
                 if (!similarity.keySet().contains(new Pair<>(key1, key2))) {
+                    TimeThis t1 = new TimeThis("sena", "e");
                     double contentSim = bookStockHashes.get(key1).minHashedContent.calcSimTo(bookStockHashes.get(key2).minHashedContent);
+                    t1.end();
                     double titleSim = bookStockHashes.get(key1).minHashedTitle.calcSimTo(bookStockHashes.get(key2).minHashedTitle);
                     similarity.put(
                             new Pair<>(key1, key2),
@@ -93,6 +95,7 @@ class Interface {
                         MinHash.shinglesHashCodeFromCharArr(list, titleShingleSize)
                 );
         for (var item : bookStockHashes.values()) {
+
             if (item.minHashedTitle.calcSimTo(nameMinHash) >= thr) {
                 result.add(item);
             }

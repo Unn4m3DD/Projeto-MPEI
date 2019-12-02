@@ -17,14 +17,14 @@ public class CountFilter implements Serializable {
 
     public void addElement(String elem) {
         for (var i = 0; i < k; i++) {
-            filter[hash(elem, i) % n]++;
+            filter[Math.abs(hash(elem, i)) % n]++;
         }
     }
 
 
     public boolean isElement(String elem) {
         for (var i = 0; i < k; i++) {
-            if (filter[hash(elem, i) % n] == 0) {
+            if (filter[Math.abs(hash(elem, i)) % n] == 0) {
                 return false;
             }
         }
@@ -45,7 +45,7 @@ public class CountFilter implements Serializable {
 
     public void remElement(String elem) {
         for (var i = 0; i < k; i++) {
-            filter[hash(elem, i) % n]--;
+            filter[Math.abs(hash(elem, i)) % n]--;
         }
     }
 }
