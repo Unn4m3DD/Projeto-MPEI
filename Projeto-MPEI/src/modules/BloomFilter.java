@@ -60,7 +60,7 @@ public class BloomFilter implements Serializable {
 
     public void addElement(String elem) {
         for (var i = 0; i < k; i++) {
-            filter[Math.abs(hash(elem.hashCode(), i)) % n] = true;
+            filter[Math.abs(hash(elem, i)) % n] = true;
         }
     }
 
@@ -68,7 +68,7 @@ public class BloomFilter implements Serializable {
     public boolean isElement(String elem) {
         if (filter == null) return false;
         for (var i = 0; i < k; i++) {
-            if (!filter[Math.abs(hash(elem.hashCode(), i)) % n]) {
+            if (!filter[Math.abs(hash(elem, i)) % n]) {
                 return false;
             }
         }
