@@ -20,7 +20,6 @@ class MinHashTest {
     public static void main(String[] args) throws FileNotFoundException {
         optimalNumberOfHashes();
         optimalSimilarity();
-        //checkar se os valores da similarity e jaccard sao minimamente decetnes
     }
 
     private static void optimalSimilarity() throws FileNotFoundException {
