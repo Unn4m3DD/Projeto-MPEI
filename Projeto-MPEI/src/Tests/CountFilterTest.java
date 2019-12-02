@@ -1,5 +1,6 @@
 package Tests;
 
+import modules.BloomFilter;
 import modules.CountFilter;
 
 import java.util.LinkedList;
@@ -8,32 +9,69 @@ import java.util.Random;
 public class CountFilterTest {
     public static int dataSetSize = 1000;
     public static int testWeight = 10000;
-
+    public static double accuracy = 0.1;
     public static void main(String[] args) {
         testFalsePos();
-        //testFalseNeg();
+        testFalseNeg();
     }
 
-    private static void testFalsePos() {
+    private static void testFalseNeg() {
+        //TODO check if this is okay
+        System.out.println("Initializing false negative test for count filter");
         int n = dataSetSize * 10;
-        int k = CountFilter.optimalK(n, dataSetSize);
+        int k = BloomFilter.optimalK(n, dataSetSize);
+        LinkedList<String> elements = new LinkedList();
+        CountFilter data = new CountFilter(n, k);
+        for(int i=0; i<dataSetSize; i++){
+            String newElem = randomString();
+            data.addElement(newElem);
+            elements.add(newElem);
+            if(i%(dataSetSize+testWeight)/10 == 0)
+                System.out.print(".");
+        }
+        boolean passed = true;
+        for (int i = 0; i < elements.size(); i++) {
+            if(! data.isElement(elements.get(i))){
+                passed=false;
+                break;
+            }
+            if(i%(dataSetSize+testWeight)/10 == 0)
+                System.out.print(".");
+        }
+        System.out.println();
+        if (passed)
+            System.out.println("Passed !");
+        else
+            System.out.println("Didn't pass false positive test");
+        }
+
+    private static void testFalsePos() {
+        //TODO check if this is actually okay
+        System.out.print("Initializing false positive test for count filter");
+        int n = dataSetSize * 10;
+        int k = BloomFilter.optimalK(n, dataSetSize);
         LinkedList elements = new LinkedList();
         CountFilter data = new CountFilter(n, k);
         for (int i = 0; i < dataSetSize; i++) {
             String newElem = randomString();
             data.addElement(newElem);
             elements.add(newElem);
+            if(i%(dataSetSize+testWeight)/10 == 0)
+                System.out.print(".");
         }
-        boolean passed = true;
+        int counter = 0;
         for (int i = 0; i < testWeight; i++) {
             String testString = randomString();
             if (data.isElement(testString) && !elements.contains(testString))
-                passed = false;
+                counter ++;
+            if(i%(dataSetSize+testWeight)/10 == 0)
+                System.out.print(".");
         }
-        if (passed)
-            System.out.println("Test for false positives passed");
+        System.out.println();
+        if (((double) counter / testWeight) > accuracy)
+            System.out.println("Passed !");
         else
-            System.out.println("Test for false positives was not passed");
+            System.out.println("Didn't pass false positive test");
     }
 
     private static String randomString() {
