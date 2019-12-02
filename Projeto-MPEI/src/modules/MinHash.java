@@ -46,16 +46,16 @@ public class MinHash implements Serializable {
         set2.retainAll(set1);
         HashSet<String> intersect = set2;
 
-        return (double)intersect.size() / union.size();
+        return (double) intersect.size() / union.size();
     }
 
     private static int union(String sentence1, String sentence2) {
-        Set <Character> sentenceSet = new TreeSet<>();
-        for(int i = 0; i < sentence1.length(); i++) {
+        Set<Character> sentenceSet = new TreeSet<>();
+        for (int i = 0; i < sentence1.length(); i++) {
             sentenceSet.add(sentence1.charAt(i));
         }
 
-        for(int i = 0; i < sentence2.length(); i++) {
+        for (int i = 0; i < sentence2.length(); i++) {
             sentenceSet.add(sentence2.charAt(i));
         }
 
@@ -65,12 +65,12 @@ public class MinHash implements Serializable {
 
     private static int sameCharacters(String sentence1, String sentence2) {
         Set<Character> sentence1Set = new TreeSet<>();
-        for(int i = 0; i < sentence1.length(); i++) {
+        for (int i = 0; i < sentence1.length(); i++) {
             sentence1Set.add(sentence1.charAt(i));
         }
 
         Set<Character> sentence2Set = new TreeSet<>();
-        for(int i = 0; i < sentence2.length(); i++) {
+        for (int i = 0; i < sentence2.length(); i++) {
             sentence2Set.add(sentence2.charAt(i));
         }
         sentence1Set.retainAll(sentence2Set);
