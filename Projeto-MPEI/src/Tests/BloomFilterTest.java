@@ -22,22 +22,20 @@ class BloomFilterTest {
 
     private static void optimalNtest() {
         int inputDataSize = 1000;
-        System.out.print("Teste de N optimo em execução: ");
-        boolean passed = true;
-        for (int size = inputDataSize; size < inputDataSize * 10; size += inputDataSize) {
-            BloomFilter dataSetFilter = createRandomFilter(size, BloomFilter.optimalK(size, inputDataSize), inputDataSize);
-            double result = falsePositiveTest(dataSetFilter);
-            if (Math.abs(result - dataSetFilter.probErr(inputDataSize)) > .1 && (size / inputDataSize) > 6)
-                passed = false;
-            if (size % (10 / 10) == 0) {
-                System.out.printf("%3.3s, ", ((double) size / (inputDataSize * 10)));
+        System.out.println("Teste de N optimo em execução: ");
+        for (int i = 1; true; i++) {
+            try {
+                BloomFilter dataSetFilter = createRandomFilter(i * inputDataSize, BloomFilter.optimalK(i * inputDataSize, inputDataSize), inputDataSize);
+                double result = falsePositiveTest(dataSetFilter);
+                if (Math.abs(result) < .02) {
+                    System.out.println("N minimo para erro < 0.1 : " + i);
+                    break;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
-        System.out.println();
-        if (passed)
-            System.out.println("Passou !");
-        else
-            System.out.println("Não passou no teste de N ótimo");
+
     }
 
     private static void falsePositiveFullTest(BloomFilter b) {
