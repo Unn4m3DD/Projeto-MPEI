@@ -6,7 +6,8 @@ import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 
-import static modules.Hash.hash;
+import static java.util.Objects.hash;
+
 
 public class BloomFilter implements Serializable {
     private int n, k;
