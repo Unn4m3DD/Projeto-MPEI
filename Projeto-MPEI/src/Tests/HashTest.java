@@ -42,8 +42,8 @@ public class HashTest {
             for (int i = 0; i < ns.length; i++) {
                 if (hashes[i].size() != numberOfHashesForMinHash) err++;
             }
-            if ((x) % (testWeight / 10) == 0)
-                System.out.printf((double) x / testWeight + ", ");
+                if ((x) % (testWeight / 10) == 0)
+                    System.out.printf((double) x / testWeight + ", ");
             totalError += ((double) err / numberOfHashesForMinHash);
         }
         System.out.println();

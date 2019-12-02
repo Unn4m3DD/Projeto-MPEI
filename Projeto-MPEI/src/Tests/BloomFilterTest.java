@@ -3,7 +3,10 @@ package Tests;
 import modules.BloomFilter;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Scanner;
+import java.util.Set;
 
 class BloomFilterTest {
     private static int testWeight = 100;
@@ -21,17 +24,17 @@ class BloomFilterTest {
         int inputDataSize = 1000;
         System.out.print("Teste de N optimo em execução: ");
         boolean passed = true;
-        for(int size = inputDataSize; size < inputDataSize * 10; size+=inputDataSize){
-           BloomFilter dataSetFilter = createRandomFilter(size, BloomFilter.optimalK(size, inputDataSize), inputDataSize);
-           double result = falsePositiveTest(dataSetFilter);
-            if (Math.abs(result - dataSetFilter.probErr(inputDataSize)) > .1 && (size/inputDataSize) > 6)
+        for (int size = inputDataSize; size < inputDataSize * 10; size += inputDataSize) {
+            BloomFilter dataSetFilter = createRandomFilter(size, BloomFilter.optimalK(size, inputDataSize), inputDataSize);
+            double result = falsePositiveTest(dataSetFilter);
+            if (Math.abs(result - dataSetFilter.probErr(inputDataSize)) > .1 && (size / inputDataSize) > 6)
                 passed = false;
             if (size % (10 / 10) == 0) {
-                System.out.printf("%3.3s, ", ((double) size / (inputDataSize* 10)));
+                System.out.printf("%3.3s, ", ((double) size / (inputDataSize * 10)));
             }
         }
         System.out.println();
-        if(passed)
+        if (passed)
             System.out.println("Passou !");
         else
             System.out.println("Não passou no teste de N ótimo");
@@ -60,7 +63,7 @@ class BloomFilterTest {
         if (numErros != 0 && ((double) numErros / testWeight) > accuracy) {
             System.out.println("Diferença entre o valor teorico e pratico de falsos positivos consistentemente alta");
             System.out.printf("%s erros em %s testes", numErros, testWeight);
-        }else{
+        } else {
             System.out.println("Passou !");
         }
     }
@@ -91,9 +94,9 @@ class BloomFilterTest {
             if (!b.isElement(elem)) erro = true;
         }
         System.out.println();
-        if(erro){
+        if (erro) {
             System.out.println("Falso Negativo Detetado");
-        }else{
+        } else {
             System.out.println("Passou !");
         }
     }

@@ -24,8 +24,8 @@ class MinHashTest {
 
     private static void optimalSimilarity() throws FileNotFoundException {
         System.out.println("Initializing test for minhash quality");
-        File [] files = createFiles(1000);
-        double[] similarity = new double[files.length -1];
+        File[] files = createFiles(1000);
+        double[] similarity = new double[files.length - 1];
         MinHash originalfile = getMinHash(files[0], optimalK);
         for (int i = 0; i < similarity.length; i++) {
             similarity[i] = originalfile.calcSimTo(getMinHash(files[i + 1], optimalK));

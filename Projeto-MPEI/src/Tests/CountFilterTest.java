@@ -18,19 +18,19 @@ public class CountFilterTest {
         int n = dataSetSize * 10;
         int k = CountFilter.optimalK(n, dataSetSize);
         LinkedList elements = new LinkedList();
-        CountFilter data = new CountFilter(n,k);
+        CountFilter data = new CountFilter(n, k);
         for (int i = 0; i < dataSetSize; i++) {
             String newElem = randomString();
             data.addElement(newElem);
             elements.add(newElem);
         }
         boolean passed = true;
-        for(int i=0; i<testWeight; i++){
+        for (int i = 0; i < testWeight; i++) {
             String testString = randomString();
-            if(data.isElement(testString) && ! elements.contains(testString))
+            if (data.isElement(testString) && !elements.contains(testString))
                 passed = false;
         }
-        if(passed)
+        if (passed)
             System.out.println("Test for false positives passed");
         else
             System.out.println("Test for false positives was not passed");
