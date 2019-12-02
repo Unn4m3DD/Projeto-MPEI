@@ -6,8 +6,7 @@ import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 
-import static java.util.Objects.hash;
-
+import static modules.Hash.hash;
 
 public class BloomFilter implements Serializable {
     private int n, k;
@@ -60,7 +59,7 @@ public class BloomFilter implements Serializable {
 
     public void addElement(String elem) {
         for (var i = 0; i < k; i++) {
-            filter[Math.abs(hash(elem, i)) % n] = true;
+            filter[Math.abs(hash(elem.hashCode(), i)) % n] = true;
         }
     }
 
@@ -68,7 +67,7 @@ public class BloomFilter implements Serializable {
     public boolean isElement(String elem) {
         if (filter == null) return false;
         for (var i = 0; i < k; i++) {
-            if (!filter[Math.abs(hash(elem, i)) % n]) {
+            if (!filter[Math.abs(hash(elem.hashCode(), i)) % n]) {
                 return false;
             }
         }

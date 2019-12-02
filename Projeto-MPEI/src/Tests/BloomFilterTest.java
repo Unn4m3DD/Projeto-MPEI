@@ -13,10 +13,10 @@ class BloomFilterTest {
     private static double accuracy = .1;
 
     public static void main(String[] args) {
-        optimalKFullTest();
+//        optimalKFullTest();
         BloomFilter b = BloomFilter.fromFile("mises.txt");
-        falseNegativeTest(b);
-        falsePositiveFullTest(b);
+//        falseNegativeTest(b);
+//        falsePositiveFullTest(b);
         optimalNtest();
     }
 
