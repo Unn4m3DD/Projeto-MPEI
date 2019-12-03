@@ -21,7 +21,7 @@ public class HashTest {
     }
 
     public static void hashTest() {
-        System.out.printf("Iniciando teste das funções de hash ");
+        System.out.printf("Hash function test in execution ");
         double totalError = 0;
         for (int x = 1; x < testWeight; x++) {
             Random r = new Random();
@@ -49,19 +49,20 @@ public class HashTest {
         System.out.println();
         totalError /= testWeight;
         if (totalError > accuracy)
-            System.out.println("Erro no teste da função de hash");
+            System.out.println("Error in hash function");
         if (totalError < accuracy)
-            System.out.println("Passou!");
+            System.out.println("Passed !");
     }
 
     public static void dispTest() {
         int values = 200;//Integer.MAX_VALUE / 1;
+        System.out.println("Test for hash dispersion in execution ");
         int numberOfDivisions = (int) Math.pow(2, 16);
         int divisionSize = 2 * (Integer.MAX_VALUE / numberOfDivisions);
         var divisions = new int[numberOfDivisions];
         Random generator = new Random();
         for (int j = 0; j < 10; j++) {
-            System.out.println("A iniciar o teste de dispersão da hash numero "+(j+1));
+//            System.out.println("Starting distribution test for hash number "+(j+1));
             int hashNumber = (int) 3;//(Math.random() * numberOfHashesForMinHash);
             for (int i = 0; i < values; i++) {
                 int hash = (hash(generator.nextInt(), hashNumber));
@@ -87,12 +88,12 @@ public class HashTest {
             }
             int stdDev = (int) Math.sqrt((double) variance);
             double dist = (double) stdDev / values;
-            System.out.println("Distribução: " + dist);
-            double threshold = 3;
+//            System.out.println("Distribução: " + dist);
+            double threshold = accuracy;
             if (dist < threshold)
-                System.out.println("Teste passado!");
+                System.out.println("Passed !");
             else
-                System.out.println("Hash mal distribuida");
+                System.out.println("Hash was poorly distributed");
         }
     }
 }

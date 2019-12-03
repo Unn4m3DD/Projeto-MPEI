@@ -23,7 +23,7 @@ class MinHashTest {
     }
 
     static void optimalSimilarity() {
-        System.out.println("Initializing test for minhash quality");
+        System.out.println("Test for minhash quality in execution ");
         File[] files = createFiles(100);
         double[] similarity = new double[files.length - 1];
         MinHash originalfile = getMinHash(files[0], optimalK);
@@ -52,7 +52,7 @@ class MinHashTest {
     }
 
     static void optimalNumberOfHashes() {
-        System.out.println("Initializing test for optimal number of hashes...");
+        System.out.println("Optimal number of hashes test in execution");
         File[] files = createFiles(100);
         for (int seedSize = 50; seedSize <= 250; seedSize += 50) {
             double[] similarity = new double[files.length - 1];
