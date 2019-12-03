@@ -4,7 +4,6 @@ import modules.BloomFilter;
 import modules.CountFilter;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.Random;
 
 public class CountFilterTest {
@@ -49,7 +48,6 @@ public class CountFilterTest {
 
         }
         System.out.println();
-//        System.out.println((double)count/elements.size());
         if ((double) count / elements.size() < 0.1)
             System.out.println("Passou !");
         else
@@ -57,29 +55,29 @@ public class CountFilterTest {
     }
 
     private static void testFalsePos() {
-        //TODO revamp com o modelo do anterior
-        System.out.print("Teste de falsos positivos em execução:");
+        System.out.println("Teste de falsos positivos em execução");
         int n = dataSetSize * 10;
         int k = BloomFilter.optimalK(n, dataSetSize);
-        LinkedList elements = new LinkedList();
+        ArrayList<String> elements = new ArrayList<>();
         CountFilter data = new CountFilter(n, k);
         for (int i = 0; i < dataSetSize; i++) {
             String newElem = randomString();
             data.addElement(newElem);
             elements.add(newElem);
-            if (i % (dataSetSize + testWeight) / 10 == 0)
-                System.out.print(".");
+            if (i % (dataSetSize / 5) == 0)
+                System.out.printf("%3.3s, ", (double) i / dataSetSize / 2);
         }
         int counter = 0;
         for (int i = 0; i < testWeight; i++) {
             String testString = randomString();
             if (data.isElement(testString) && !elements.contains(testString))
                 counter++;
-            if (i % (dataSetSize + testWeight) / 10 == 0)
-                System.out.print(".");
+            if (i % (testWeight / 5) == 0)
+                System.out.printf("%3.3s, ", (0.5 + (double) i / testWeight / 2));
         }
+//        System.out.println(counter);
         System.out.println();
-        if (((double) counter / testWeight) > accuracy)
+        if (((double) counter / testWeight) < accuracy)
             System.out.println("Passou !");
         else
             System.out.println("Não passou o teste de falsos positivos");

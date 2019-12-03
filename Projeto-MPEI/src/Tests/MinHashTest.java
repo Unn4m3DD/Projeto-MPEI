@@ -24,26 +24,26 @@ class MinHashTest {
 
     private static void optimalSimilarity() throws FileNotFoundException {
         System.out.println("Initializing test for minhash quality");
-        File[] files = createFiles(1000);
+        File[] files = createFiles(100);
         double[] similarity = new double[files.length - 1];
         MinHash originalfile = getMinHash(files[0], optimalK);
         for (int i = 0; i < similarity.length; i++) {
             similarity[i] = originalfile.calcSimTo(getMinHash(files[i + 1], optimalK));
-            if (i % similarity.length == 0)
-                System.out.print(".");
+            if (i % (similarity.length / 5) == 0)
+                System.out.printf("%3.3s, ", ((double) i / similarity.length / 2));
         }
         double[] jaccardIndex = new double[similarity.length];
         for (int i = 0; i < jaccardIndex.length; i++) {
             jaccardIndex[i] = MinHash.jaccardIndex(files[0], files[i + 1], shingleSize);
-            if (i % similarity.length == 0)
-                System.out.print(".");
+            if (i % (similarity.length / 5) == 0)
+                System.out.printf("%3.3s, ", (0.5 + (double) i / similarity.length / 2));
         }
-        System.out.println(".");
 
         double sum = 0;
         for (int i = 0; i < similarity.length; i++) {
             sum += Math.abs(similarity[i] - jaccardIndex[i]);
         }
+        System.out.println();
         sum /= similarity.length;
         if (sum < accuracy)
             System.out.println("Test for difference between Jaccard index and minhash similarity passed!");
@@ -59,17 +59,17 @@ class MinHashTest {
             MinHash originalfile = getMinHash(files[0], seedSize);
             for (int i = 0; i < similarity.length; i++) {
                 similarity[i] = originalfile.calcSimTo(getMinHash(files[i + 1], seedSize));
-                if (i % similarity.length == 0)
-                    System.out.print(".");
+                if (i % (similarity.length / 5) == 0)
+                    System.out.printf("%3.3s, ",  (double) i / similarity.length / 2);
             }
 
             double[] jaccardIndex = new double[similarity.length];
             for (int i = 0; i < jaccardIndex.length; i++) {
                 jaccardIndex[i] = MinHash.jaccardIndex(files[0], files[i + 1], shingleSize);
-                if (i % similarity.length == 0)
-                    System.out.print(".");
+                if (i % (similarity.length / 5) == 0)
+                    System.out.printf("%3.3s, ", (0.5 + (double) i / similarity.length / 2));
             }
-            System.out.println(".");
+            System.out.println("");
 
             double sum = 0;
             for (int i = 0; i < similarity.length; i++) {
@@ -79,8 +79,8 @@ class MinHashTest {
             if (sum < accuracy) {
                 System.out.println("Test for K = " + seedSize + " passed!");
                 optimalK = seedSize;
-            } else
-                System.out.println("K= " + seedSize + "is not optimal");
+                break;
+            }
         }
     }
 
