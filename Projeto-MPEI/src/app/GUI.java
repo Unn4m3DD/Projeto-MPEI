@@ -3,28 +3,27 @@
 
 package app;
 
+import Tests.GlobalTests;
 import modules.MinHash;
-import util.Mutable;
-import util.ProcessedBooksResult;
-import util.SimContainer;
-import util.TimeThis;
+import util.*;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 
 import static app.Interface.*;
 import static util.Environment.contentShingleSize;
 
-// TODO: 02/12/2019 adicionar botão de adicionar e remover livros
-// TODO: 02/12/2019 adicionar verificação do método parse directory
-// TODO: 02/12/2019 adicionar pasta container para download de dados
+
 // TODO: 02/12/2019 adicionar tool que chama função de teste
+
 /* D:\dev\Projeto-MPEI\books\Spanish */
 class GUI extends JFrame implements ActionListener {
     static Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -36,9 +35,9 @@ class GUI extends JFrame implements ActionListener {
     String[] buttonsKeys = new String[]{
             "Compare 2 Books", "All Similar Content", //"Parse Directory",
             "Search Title", "Check Title", "Request Book", "Return Book",
-            "All Similar Title", "Check book Availability"};
+            "All Similar Title", "Check book Availability", "Add Book"};
     String[] fileMenuItemKeys = new String[]{"Parse Directory", "Save Library", "Load Library", "Exit"};
-    String[] toolsMenuItemKeys = new String[]{"Calculate Jaccard Index", "Download Data Set"};
+    String[] toolsMenuItemKeys = new String[]{"Calculate Jaccard Index", "Download Data Set", "Tests"};
 
     private void updateButtonClickability() {
         for (var button : buttons.values()) {
@@ -91,6 +90,8 @@ class GUI extends JFrame implements ActionListener {
             checkBookAvailability();
         else if (e.getSource().equals(buttons.get("All Similar Content")))
             allSimilarContent();
+        else if (e.getSource().equals(buttons.get("Add Book")))
+            addBookMenu();
         else if (e.getSource().equals(buttons.get("Compare 2 Books")))
             compare2Books();
         else if (e.getSource().equals(menuItems.get("Parse Directory")))
@@ -103,13 +104,53 @@ class GUI extends JFrame implements ActionListener {
             downloadDataSetPopup();
         else if (e.getSource().equals(menuItems.get("Calculate Jaccard Index")))
             jaccardSim();
-
+        else if (e.getSource().equals(menuItems.get("Tests")))
+            tests();
 
     }
 
 
-    private GUI(String windowHeader) throws IOException, ClassNotFoundException {
+    private void tests() {
+        JFrame console = new JFrame();
+        JPanel outerPanel = new JPanel(new BorderLayout(10,10));
+        outerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        outerPanel.add(new JLabel("Executing tests"), BorderLayout.NORTH);
+        JTextArea jta = new JTextArea();
+        JScrollPane scrll = new JScrollPane(jta);
+        outerPanel.add(scrll, BorderLayout.CENTER);
+        JPanel downPanel = new JPanel(new GridLayout(1,3));
+        JPanel rerunPanel = new JPanel();
+        JButton rerun = new JButton("Re-run");
+        rerunPanel.add(rerun);
+        downPanel.add(rerunPanel);
+        JPanel pausePanel = new JPanel();
+        JButton pause = new JButton("Pause");
+        pausePanel.add(pause);
+        downPanel.add(pausePanel);
+        JPanel stopPanel = new JPanel();
+        JButton stop = new JButton("Stop");
+        stopPanel.add(stop);
+        downPanel.add(stopPanel);
+        outerPanel.add(downPanel, BorderLayout.SOUTH);
+        console.add(outerPanel);
+        console.setSize(new Dimension(650, 400));
+        int x = (screenSize.width - console.getWidth()) / 2;
+        int y = (screenSize.height - console.getHeight()) / 2;
+        console.setResizable(false);
+        console.setLocation(x, y);
+        console.setVisible(true);
+        Thread tests = (new GlobalTests(jta, 500, new boolean[0]));
+        tests.start();
+        stop.addActionListener((e)-> {
+            tests.interrupt();
+        });
+    }
+
+
+    private GUI(String windowHeader) {
         super(windowHeader);
+        ImageIcon img = new ImageIcon("icon.png");
+        this.setIconImage(img.getImage());
         initializeButtonsAndPanels();
         setLayout(new GridLayout(3, 3));
         Dimension windowSize = new Dimension(1000, 600);
@@ -656,7 +697,7 @@ class GUI extends JFrame implements ActionListener {
                     }
                 }
             } catch (Exception exc) {
-                JOptionPane.showMessageDialog(null, "The inserted value is not valid");
+                JOptionPane.showMessageDialog(this, "The inserted value is not valid");
                 exc.printStackTrace();
             }
         });
@@ -765,7 +806,7 @@ class GUI extends JFrame implements ActionListener {
                     }
                 }
             } catch (Exception exc) {
-                JOptionPane.showMessageDialog(null, "The inserted value is not valid");
+                JOptionPane.showMessageDialog(this, "The inserted value is not valid");
                 exc.printStackTrace();
             }
         });
@@ -903,7 +944,7 @@ class GUI extends JFrame implements ActionListener {
                 numberOfBooks = Integer.parseInt(input.getText());
                 if (numberOfBooks <= 0) throw new Exception();
             } catch (Exception exp) {
-                JOptionPane.showMessageDialog(null, "Insert a valid quantity");
+                JOptionPane.showMessageDialog(this, "Insert a valid quantity");
                 return;
             }
             qttFrame.dispose();
@@ -953,6 +994,24 @@ class GUI extends JFrame implements ActionListener {
                 w.execute();
             }
         });
+
+    }
+
+    private void addBookMenu() {
+        JOptionPane.showMessageDialog(this, "Select a book to add");
+        JFileChooser fileChooser = new JFileChooser(".");
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        fileChooser.setDialogTitle("Select Book");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Book (.txt)", "txt");
+        fileChooser.setFileFilter(filter);
+        int option = fileChooser.showOpenDialog(this);
+        if (option == JFileChooser.APPROVE_OPTION) {
+            if (addBook(fileChooser.getSelectedFile())) {
+                JOptionPane.showMessageDialog(this, "Book added");
+                return;
+            }
+        }
+        JOptionPane.showMessageDialog(this, "Book not added");
 
     }
 

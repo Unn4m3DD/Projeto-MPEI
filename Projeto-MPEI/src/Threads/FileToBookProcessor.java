@@ -5,6 +5,7 @@ import util.Book;
 import util.Mutable;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
@@ -35,7 +36,7 @@ public class FileToBookProcessor extends Thread {
     public void run() {
         if (dir.isDirectory())
             try {
-                File[] files = dir.listFiles();
+                File[] files = dir.listFiles((dir, name) -> name.toLowerCase().endsWith(".txt"));
                 availableBooks.setParams(files.length * 8, BloomFilter.optimalK(files.length * 8, files.length));
                 int pace = (files.length / 100);
                 for (int i = 0; i < files.length; i++) {

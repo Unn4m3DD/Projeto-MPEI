@@ -9,6 +9,7 @@ import util.*;
 import java.io.*;
 import java.util.*;
 
+import static util.Environment.contentShingleSize;
 import static util.Environment.titleShingleSize;
 
 class Interface {
@@ -19,13 +20,28 @@ class Interface {
     public static HashMap<Pair<String, String>, Pair<Double, Double>> similarity = new HashMap<>();
 
     //This function may not download numOfBooks, this argument is just an indication
-    public static void downloadTestData(File dir,int numOfBooks, Mutable<Double> progress) {
+    public static void downloadTestData(File dir, int numOfBooks, Mutable<Double> progress) {
         Thread bd = new BookDownloader(numOfBooks, dir, progress);
         bd.start();
     }
 
     public static boolean checkBook(String name) {
         return availableBooks.isElement(name);
+    }
+
+    public static boolean addBook(File f) {
+        Book b = new Book(f);
+        var toAdd = new ProcessedBooksResult();
+        toAdd.minHashedContent = new MinHash(MinHash.shinglesHashCodeFromCharArr(b.getContent(), contentShingleSize));
+        toAdd.minHashedContent = new MinHash(MinHash.shinglesHashCodeFromCharArr(b.getTitle(), titleShingleSize));
+        StringBuilder sb = new StringBuilder();
+        for(var c: b.getTitle())
+            sb.append(c);
+        toAdd.name = sb.toString();
+        if (availableBooks.isElement(toAdd.name)) return false;
+        availableBooks.addElement(toAdd.name);
+        bookStockHashes.put(f.getName(), toAdd);
+        return true;
     }
 
     private static void allSim() {
@@ -103,7 +119,7 @@ class Interface {
         return result;
     }
 
-    public static boolean isAvailable(String name){
+    public static boolean isAvailable(String name) {
         if (!availableBooks.isElement(name)) return false;
         if (requestedBooks.isElement(name)) return false;
         return true;
@@ -131,7 +147,7 @@ class Interface {
         return bookStockHashes;
     }
 
-    public static void parseDirectory(File dir,Mutable<Double> progress) {
+    public static void parseDirectory(File dir, Mutable<Double> progress) {
         BookDirectoryProcessor processor = new BookDirectoryProcessor(dir, progress, availableBooks);
         processor.start();
         bookStockHashes = processor.result;
@@ -142,7 +158,7 @@ class Interface {
                 ie.printStackTrace();
             }
         requestedBooks = new CountFilter(availableBooks.getN(), availableBooks.getK());
-
+        availableBooks.addElement("");
     }
 
     public static void save(File destination) throws IOException {

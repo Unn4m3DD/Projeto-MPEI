@@ -16,7 +16,7 @@ public class CountFilterTest {
         testFalseNeg();
     }
 
-    private static void testFalseNeg() {
+    static void testFalseNeg() {
         System.out.println("Teste de falsos negativos em execução");
         int n = dataSetSize * 10;
         int k = BloomFilter.optimalK(n, dataSetSize);
@@ -54,7 +54,7 @@ public class CountFilterTest {
             System.out.println("Não passou o teste de falsos negativos");
     }
 
-    private static void testFalsePos() {
+    static void testFalsePos() {
         System.out.println("Teste de falsos positivos em execução");
         int n = dataSetSize * 10;
         int k = BloomFilter.optimalK(n, dataSetSize);
@@ -83,7 +83,7 @@ public class CountFilterTest {
             System.out.println("Não passou o teste de falsos positivos");
     }
 
-    private static String randomString() {
+    static String randomString() {
         int leftLimit = 97; // letter 'a'
         int rightLimit = 122; // letter 'z'
         int targetStringLength = 50;

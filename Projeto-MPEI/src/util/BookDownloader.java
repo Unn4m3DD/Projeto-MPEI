@@ -15,7 +15,10 @@ public class BookDownloader extends Thread {
     int numOfBooks;
 
     public BookDownloader(int numOfBooks, File dir, Mutable<Double> progress) {
-        this.dir = dir;
+        File newdir = new File(dir.getAbsolutePath() + File.separator + "data");
+        if(!newdir.mkdir())
+            return;
+        this.dir = newdir;
         this.progress = progress;
         this.numOfBooks = numOfBooks;
     }
