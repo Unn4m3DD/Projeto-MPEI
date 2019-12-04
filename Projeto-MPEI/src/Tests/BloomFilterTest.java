@@ -13,6 +13,7 @@ class BloomFilterTest {
     static double accuracy = .1;
     static int n;
 
+
     public static void main(String[] args) {
         optimalKFullTest();
         n = optimalNtest(accuracy);
@@ -23,13 +24,13 @@ class BloomFilterTest {
 
     static int optimalNtest(double thr) {
         int inputDataSize = 1000;
-        System.out.println("Teste de N optimo em execução: ");
+        System.out.println("Optimal N test in execution ");
         for (int i = 1; true; i++) {
             try {
                 BloomFilter dataSetFilter = createRandomFilter(i * inputDataSize, BloomFilter.optimalK(i * inputDataSize, inputDataSize), inputDataSize);
                 double result = falsePositiveTest(dataSetFilter);
                 if (Math.abs(result) < thr) {
-                    System.out.printf("N minimo para erro < %5.5s%s : %s\n", thr * 100,"%", i);
+                    System.out.printf("Minimal N for error < %5.5s%s : %s\n", thr * 100,"%", i);
                     return i;
                 }
             } catch (Exception e) {
@@ -40,7 +41,7 @@ class BloomFilterTest {
     }
 
     static void falsePositiveFullTest(BloomFilter b) {
-        System.out.print("Teste de falsos positivos em execução: ");
+        System.out.print("False positive test in execution ");
         File book = new File("mises.txt");
         Set<String> wordSet = new HashSet<>();
         try (Scanner k = new Scanner(book)) {
@@ -60,10 +61,10 @@ class BloomFilterTest {
         }
         System.out.println();
         if (numErros != 0 && ((double) numErros / testWeight) > accuracy) {
-            System.out.println("Diferença entre o valor teorico e pratico de falsos positivos consistentemente alta");
-            System.out.printf("%s erros em %s testes", numErros, testWeight);
+            System.out.println("Difference between theoretical and practical values for false positives consistently high");
+            System.out.printf("%s errors in %s tests", numErros, testWeight);
         } else {
-            System.out.println("Passou !");
+            System.out.println("Passed !");
         }
     }
 
@@ -78,7 +79,7 @@ class BloomFilterTest {
     }
 
     static void falseNegativeTest(BloomFilter b) {
-        System.out.print("Teste de falsos negativos em execução ");
+        System.out.print("False negatives test in execution ");
         File book = new File("mises.txt");
         Set<String> wordSet = new HashSet<>();
         try (Scanner k = new Scanner(book)) {
@@ -94,9 +95,9 @@ class BloomFilterTest {
         }
         System.out.println();
         if (erro) {
-            System.out.println("Falso Negativo Detetado");
+            System.out.println("A false negative has been detected");
         } else {
-            System.out.println("Passou !");
+            System.out.println("Passed !");
         }
     }
 
@@ -124,7 +125,7 @@ class BloomFilterTest {
 
 
     static void optimalKFullTest() {
-        System.out.print("Teste de falsos positivos em execução: ");
+        System.out.print("False positive test in execution ");
         var numErros = 0;
         for (var i = 0; i < testWeight; i++) {
             int r1 = (int) Math.round(Math.random() * 10000);
@@ -137,10 +138,10 @@ class BloomFilterTest {
         }
         System.out.println();
         if (numErros != 0 && ((double) numErros / testWeight) > accuracy) {
-            System.out.println("Erro na função de K otimo");
-            System.out.printf("%s erros em %s testes", numErros, testWeight);
+            System.out.println("Error in optimal K function");
+            System.out.printf("%s errors in %s tests", numErros, testWeight);
         } else {
-            System.out.println("Passou !");
+            System.out.println("Passed !");
         }
     }
 
