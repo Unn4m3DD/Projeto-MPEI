@@ -2,30 +2,62 @@ package util;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import static java.util.Arrays.spliterator;
 
 public class Book {
     private ArrayList<Character> title = new ArrayList<>(), content = new ArrayList<>();
     private String name;
 
+//    public Book(File f) {
+//        TimeThis t = new TimeThis("File to Book ");
+//        name = f.getName();
+//        boolean titleFetched = false;
+//        try (Scanner s = new Scanner(f)) {
+//            while (s.hasNextLine()) {
+//                String c_line = s.nextLine();
+//                if (!titleFetched && c_line.split(":")[0].equals("Title") && c_line.split(":").length > 1) {
+//                    for (var c : c_line.split(":")[1].trim().toCharArray()) {
+//                        title.add(c);
+//                    }
+//                    titleFetched = true;
+//                }
+//                for (var c : c_line.toCharArray()) {
+//                    content.add(c);
+//                }
+//            }
+//        } catch (IOException ioe) {
+//            ioe.printStackTrace();
+//        }
+//        t.end();
+//    }
+
     public Book(File f) {
         TimeThis t = new TimeThis("File to Book ");
         name = f.getName();
-        boolean titleFetched = false;
-        try (Scanner s = new Scanner(f)) {
+        try {
+            Scanner s = new Scanner(f);
             while (s.hasNextLine()) {
                 String c_line = s.nextLine();
-                if (!titleFetched && c_line.split(":")[0].equals("Title") && c_line.split(":").length > 1) {
+                if (c_line.split(":")[0].equals("Title") && c_line.split(":").length > 1) {
                     for (var c : c_line.split(":")[1].trim().toCharArray()) {
                         title.add(c);
                     }
-                    titleFetched = true;
-                }
-                for (var c : c_line.toCharArray()) {
-                    content.add(c);
+                    break;
                 }
             }
+            Arrays.stream(new int[2]);
+            Files.readAllLines(Path.of(f.getAbsolutePath())).stream().
+                    map(String::toCharArray).forEach(e -> {
+                for (var elem : e) content.add(elem);
+            });
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }

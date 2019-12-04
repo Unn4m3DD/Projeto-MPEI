@@ -34,24 +34,24 @@ public class GlobalTests extends Thread {
         BloomFilter b = BloomFilter.fromFile("mises.txt", 10);
 
         if (testsToPerform[0])
-            optimalKFullTest();
-        else if (testsToPerform[1])
             n = optimalNtest(params[0]);
-        else if (testsToPerform[2])
+        if (testsToPerform[1])
+            optimalKFullTest();
+        if (testsToPerform[2])
             falseNegativeTest(b);
-        else if (testsToPerform[3])
+        if (testsToPerform[3])
             falsePositiveFullTest(b);
-        else if (testsToPerform[4])
+        if (testsToPerform[4])
             testFalsePos();
-        else if (testsToPerform[5])
+        if (testsToPerform[5])
             testFalseNeg();
-        else if (testsToPerform[6])
+        if (testsToPerform[6])
             dispTest();
-        else if (testsToPerform[7])
+        if (testsToPerform[7])
             distTest();
-        else if (testsToPerform[8])
+        if (testsToPerform[8])
             optimalSimilarity();
-        else if (testsToPerform[9])
+        if (testsToPerform[9])
             optimalNumberOfHashes(params[1]);
 
     }
