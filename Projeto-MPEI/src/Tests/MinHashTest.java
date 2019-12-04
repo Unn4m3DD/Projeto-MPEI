@@ -13,9 +13,9 @@ import java.util.Scanner;
 
 class MinHashTest {
     public static int shingleSize = 8;
-    public static int fileSize;
+    public static int fileSize = 50;
     public static double accuracy = 0.05;
-    public static int optimalK = Integer.MAX_VALUE;
+    public static int optimalK = 150;
 
     public static void main(String[] args) {
         optimalNumberOfHashes(accuracy);
@@ -24,7 +24,7 @@ class MinHashTest {
 
     static void optimalSimilarity() {
         System.out.println("Initializing test for minhash quality");
-        File[] files = createFiles(100);
+        File[] files = createFiles(fileSize);
         double[] similarity = new double[files.length - 1];
         MinHash originalfile = getMinHash(files[0], optimalK);
         for (int i = 0; i < similarity.length; i++) {
@@ -53,7 +53,7 @@ class MinHashTest {
 
     static void optimalNumberOfHashes(double thr) {
         System.out.println("Initializing test for optimal number of hashes...");
-        File[] files = createFiles(100);
+        File[] files = createFiles(fileSize);
         for (int seedSize = 50; seedSize <= 250; seedSize += 20) {
             double[] similarity = new double[files.length - 1];
             MinHash originalfile = getMinHash(files[0], seedSize);
@@ -79,9 +79,17 @@ class MinHashTest {
             if (sum < thr) {
                 System.out.printf("Number of hash function to maximum avg distance %5.5s = %s\n", thr, seedSize);
                 optimalK = seedSize;
+                deleteFiles(files);
                 break;
             }
         }
+    }
+
+    private static void deleteFiles(File [] files) {
+        for (int i = 1; i <files.length; i++) {
+            files[i].delete();
+        }
+        // TODO: 04/12/2019 implementar o método que elimine os ficheiros 
     }
 
     static MinHash getMinHash(File file, int seedSize) {
@@ -92,7 +100,9 @@ class MinHashTest {
 
     static File[] createFiles(int numFiles) {
         File[] fileArr = new File[numFiles + 1];
-        fileArr[0] = new File("Projeto-MPEI" + File.separator + "src" + File.separator + "Tests" + File.separator + "test" + File.separator + "test.txt");
+        fileArr[0] = new File("test" + File.separator + "test.txt");
+
+//        fileArr[0] = new File("Projeto-MPEI" + File.separator + "src" + File.separator + "Tests" + File.separator + "test" + File.separator + "test.txt");
         try (Scanner fileReader = new Scanner(fileArr[0])) {
             String sentence = "";
             while (fileReader.hasNext()) {
@@ -103,7 +113,8 @@ class MinHashTest {
             double base = Math.log(numFiles);
 
             for (int i = 1; i <= numFiles; i++) {
-                fileArr[i] = new File("Projeto-MPEI" + File.separator + "src" + File.separator + "Tests" + File.separator + "test" + File.separator + "test" + i * 10 + ".txt");
+               // fileArr[i] = new File("Projeto-MPEI" + File.separator + "src" + File.separator + "Tests" + File.separator + "test" + File.separator + "test" + i * 10 + ".txt");
+                fileArr[i] = new File("test" + File.separator + "test" + i * 10 + ".txt");
                 PrintWriter writeFiles = new PrintWriter(fileArr[i]);
                 for (int x = 0; x < fileSize; x++) {
                     writeFiles.print(Math.random() < Math.log(i) / base / 3 + 0.66 ? sentence.charAt(x) : randomChar());

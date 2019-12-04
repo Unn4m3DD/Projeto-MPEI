@@ -38,9 +38,9 @@ public class GlobalTests extends Thread {
         if (testsToPerform[1])
             optimalKFullTest();
         if (testsToPerform[2])
-            falseNegativeTest(b);
+            falseNegativeTest();
         if (testsToPerform[3])
-            falsePositiveFullTest(b);
+            falsePositiveFullTest();
         if (testsToPerform[4])
             testFalsePos();
         if (testsToPerform[5])

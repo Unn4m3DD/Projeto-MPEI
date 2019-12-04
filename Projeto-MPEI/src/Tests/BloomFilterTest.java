@@ -3,23 +3,19 @@ package Tests;
 import modules.BloomFilter;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 class BloomFilterTest {
     static int testWeight = 100;
     static double accuracy = .1;
-    static int n;
+    static int n = 8;
 
 
     public static void main(String[] args) {
         optimalKFullTest();
         n = optimalNtest(accuracy);
-        BloomFilter b = BloomFilter.fromFile("mises.txt", n);
-        falseNegativeTest(b);
-        falsePositiveFullTest(b);
+        falseNegativeTest();
+        falsePositiveFullTest();
     }
 
     static int optimalNtest(double thr) {
@@ -28,9 +24,9 @@ class BloomFilterTest {
         for (int i = 1; true; i++) {
             try {
                 BloomFilter dataSetFilter = createRandomFilter(i * inputDataSize, BloomFilter.optimalK(i * inputDataSize, inputDataSize), inputDataSize);
-                double result = falsePositiveTest(dataSetFilter);
+                double result = falsePositiveTest(dataSetFilter, new HashSet<>());
                 if (Math.abs(result) < thr) {
-                    System.out.printf("Minimal N for error < %5.5s%s : %s\n", thr * 100,"%", i);
+                    System.out.printf("Minimal N for error < %5.5s%s : %s\n", thr * 100, "%", i);
                     return i;
                 }
             } catch (Exception e) {
@@ -40,8 +36,9 @@ class BloomFilterTest {
 
     }
 
-    static void falsePositiveFullTest(BloomFilter b) {
+    static void falsePositiveFullTest() {
         System.out.print("False positive test in execution ");
+        BloomFilter b = BloomFilter.fromFile("mises.txt", n);
         File book = new File("mises.txt");
         Set<String> wordSet = new HashSet<>();
         try (Scanner k = new Scanner(book)) {
@@ -53,7 +50,7 @@ class BloomFilterTest {
         }
         var numErros = 0;
         for (var i = 0; i < testWeight; i++) {
-            var result = falsePositiveTest(b);
+            var result = falsePositiveTest(b, wordSet);
             if (Math.abs(result - b.probErr(wordSet.size())) > .1) numErros++;
             if (i % (testWeight / 10) == 0) {
                 System.out.printf("%3.3s, ", ((double) i / testWeight));
@@ -68,18 +65,19 @@ class BloomFilterTest {
         }
     }
 
-    static double falsePositiveTest(BloomFilter b) {
+    static double falsePositiveTest(BloomFilter b, Set<String> wordSet) {
         int count = 0;
-        for (var i = 0; i < 1000000; i++) {
-            boolean a = b.isElement(randomString());
-            if (b.isElement(randomString())) count++;
+        for (var i = 0; i < 1000000/2; i++) {
+            String s = randomString();
+            if (b.isElement(s) && !wordSet.contains(s)) count++;
         }
 
-        return (double) count / 1000000;
+        return (double) count / 1000000/2;
     }
 
-    static void falseNegativeTest(BloomFilter b) {
+    static void falseNegativeTest() {
         System.out.print("False negatives test in execution ");
+        BloomFilter b = BloomFilter.fromFile("mises.txt", n);
         File book = new File("mises.txt");
         Set<String> wordSet = new HashSet<>();
         try (Scanner k = new Scanner(book)) {
@@ -125,13 +123,14 @@ class BloomFilterTest {
 
 
     static void optimalKFullTest() {
+        int maxDiffofK = 2;
         System.out.print("False positive test in execution ");
         var numErros = 0;
         for (var i = 0; i < testWeight; i++) {
             int r1 = (int) Math.round(Math.random() * 10000);
             int r2 = (int) Math.round(Math.random() * r1);
             var result = optimalKTest(r1, r2);
-            if (Math.abs(result.experimental - result.teorico) > 2) numErros++;
+            if (Math.abs(result.experimental - result.teorico) > maxDiffofK) numErros++;
             if (i % (testWeight / 10) == 0) {
                 System.out.printf("%3.3s, ", ((double) i / testWeight));
             }
@@ -161,7 +160,7 @@ class BloomFilterTest {
             }
         }
         if (c_best_err == 0 || BloomFilter.optimalK(n, numElem) > 10) return new TestResult(0, 0);
-        return new TestResult(c_best_index, BloomFilter.optimalK(n, numElem));
+        return new TestResult(BloomFilter.optimalK(n, numElem), c_best_index);
     }
 
 }

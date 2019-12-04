@@ -22,7 +22,7 @@ import static app.Interface.*;
 import static util.Environment.contentShingleSize;
 
 
-// TODO: 03/12/2019  verificar se as comparações são guardadas
+
 /* D:\dev\Projeto-MPEI\books\Spanish */
 class GUI extends JFrame implements ActionListener {
     static Toolkit toolkit = Toolkit.getDefaultToolkit();

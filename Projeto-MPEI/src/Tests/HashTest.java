@@ -55,14 +55,15 @@ public class HashTest {
     }
 
     public static void distTest() {
-        int values = 200;//Integer.MAX_VALUE / 1;
+        int values = Integer.MAX_VALUE / 20000;
         int numberOfDivisions = (int) Math.pow(2, 16);
         int divisionSize = 2 * (Integer.MAX_VALUE / numberOfDivisions);
         var divisions = new int[numberOfDivisions];
         Random generator = new Random();
-        for (int j = 0; j < 10; j++) {
-            System.out.println("Initializing dispersion test for hash number "+(j+1));
-            int hashNumber = (int) 3;//(Math.random() * numberOfHashesForMinHash);
+        for (int j = 0; j < 2; j++) {
+            // TODO: 04/12/2019 alterar os prints
+            //System.out.println("Initializing dispersion test for hash number "+(j+1));
+            int hashNumber = (int) (Math.random() * numberOfHashesForMinHash);
             for (int i = 0; i < values; i++) {
                 int hash = (hash(generator.nextInt(), hashNumber));
                 for (int k = 0; k < divisions.length; k++) {
@@ -81,15 +82,11 @@ public class HashTest {
                 avg += ((double) divisions[i] / numberOfDivisions);
             }
 
-            long variance = 0;
-            for (int i = 0; i < divisions.length; i++) {
-                variance += (Math.pow(divisions[i] - avg, 2) / divisions.length);
-            }
-            int stdDev = (int) Math.sqrt((double) variance);
-            double dist = (double) stdDev / values;
-            System.out.println("Distribution: " + dist);
+            double variance = 0;
+            for (int division : divisions) variance += (Math.pow(division - avg, 2) / divisions.length);
+            double stdDev =  Math.sqrt(variance);
             double threshold = 3;
-            if (dist < threshold)
+            if (stdDev < threshold)
                 System.out.println("Passed !");
             else
                 System.out.println("Poorly distributed hash");
