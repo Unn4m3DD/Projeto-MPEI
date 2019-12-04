@@ -238,7 +238,6 @@ class GUI extends JFrame implements ActionListener {
     }
 
 
-
     private GUI(String windowHeader) {
         super(windowHeader);
         this.setIconImage(img.getImage());
@@ -644,6 +643,8 @@ class GUI extends JFrame implements ActionListener {
     }
 
     private void allSimilarContent() {
+
+        boolean lshUsed = bookStockHashes.size() > 2000;
         Mutable<HashMap<String, List<SimContainer>>> toShow = new Mutable<>(allSimContent(.8));
         JFrame window = new JFrame("Similar Content");
         window.setIconImage(img.getImage());
@@ -681,10 +682,13 @@ class GUI extends JFrame implements ActionListener {
         JPanel thrPanel = new JPanel(new BorderLayout());
 
         JLabel thrTxt = new JLabel("Insert a threshold:");
+        thrTxt.setEnabled(!lshUsed);
         thrPanel.add(thrTxt, BorderLayout.NORTH);
 
         JPanel thrTxtBoxPanel = new JPanel();
         JTextField thrTxtBox = new JTextField("0.8");
+        thrTxtBox.setEnabled(!lshUsed);
+
         thrTxtBox.setHorizontalAlignment(0);
         thrTxtBox.setPreferredSize(new Dimension(100, 25));
         thrTxtBox.setSize(new Dimension(100, 25));
@@ -694,6 +698,8 @@ class GUI extends JFrame implements ActionListener {
 
         JPanel thrBtnPanel = new JPanel();
         JButton thrBtn = new JButton("Calculate");
+        thrBtn.setEnabled(!lshUsed);
+
         thrBtnPanel.add(thrBtn);
         thrBtn.addActionListener((e) -> {
             try {
@@ -715,6 +721,9 @@ class GUI extends JFrame implements ActionListener {
         });
 
         thrTxtBoxPanel.add(thrBtnPanel);
+        if (lshUsed)
+            thrTxtBoxPanel.add(new JLabel("Threshold definition not available because the set is to large and therefore " +
+                    "LSHVariant optimization was used"));
         thrPanel.setPreferredSize(new Dimension(200, 200));
         middle.add(thrPanel, BorderLayout.CENTER);
         middle.add(new JPanel(), BorderLayout.SOUTH);
@@ -754,11 +763,11 @@ class GUI extends JFrame implements ActionListener {
     }
 
     private void allSimilarTitle() {
+        boolean lshUsed = bookStockHashes.size() > 2000;
         Mutable<HashMap<String, List<SimContainer>>> toShow = new Mutable<>(allSimTitle(.8));
         JFrame window = new JFrame("Similar Content");
         window.setIconImage(img.getImage());
         window.setLayout(new BorderLayout(0, 1));
-
 
         JPanel list1 = new JPanel();
         DefaultListModel<BookListItem> listModel1 = new DefaultListModel<>();
@@ -791,6 +800,7 @@ class GUI extends JFrame implements ActionListener {
         JPanel thrPanel = new JPanel(new BorderLayout());
 
         JLabel thrTxt = new JLabel("Insert a threshold:");
+        thrTxt.setEnabled(!lshUsed);
         thrPanel.add(thrTxt, BorderLayout.NORTH);
 
         JPanel thrTxtBoxPanel = new JPanel();
@@ -799,11 +809,12 @@ class GUI extends JFrame implements ActionListener {
         thrTxtBox.setPreferredSize(new Dimension(100, 25));
         thrTxtBox.setSize(new Dimension(100, 25));
         thrTxtBoxPanel.add(thrTxtBox);
-
+        thrTxtBox.setEnabled(!lshUsed);
         thrPanel.add(thrTxtBoxPanel, BorderLayout.CENTER);
 
         JPanel thrBtnPanel = new JPanel();
         JButton thrBtn = new JButton("Calculate");
+        thrBtn.setEnabled(!lshUsed);
         thrBtnPanel.add(thrBtn);
         thrBtn.addActionListener((e) -> {
             try {
@@ -825,6 +836,9 @@ class GUI extends JFrame implements ActionListener {
         });
 
         thrTxtBoxPanel.add(thrBtnPanel);
+        if (lshUsed)
+            thrTxtBoxPanel.add(new JLabel("Threshold definition not available because the set is to large and therefore " +
+                    "LSHVariant optimization was used"));
         thrPanel.setPreferredSize(new Dimension(200, 200));
         middle.add(thrPanel, BorderLayout.CENTER);
         middle.add(new JPanel(), BorderLayout.SOUTH);

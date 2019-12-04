@@ -3,6 +3,7 @@ package app;
 import Threads.BookDirectoryProcessor;
 import modules.BloomFilter;
 import modules.CountFilter;
+import modules.LSHVariant;
 import modules.MinHash;
 import util.*;
 
@@ -59,26 +60,56 @@ class Interface {
     }
 
     private static void allSim() {
-        TimeThis t = new TimeThis(similarity.keySet().size() > 0 ? "Look Up All Similarities" : "Calc All Similarities", "e");
         int count = 0;
-        double pace = bookStockHashes.size() / 100;
-        for (var key1 : bookStockHashes.keySet()) {
-            for (var key2 : bookStockHashes.keySet()) {
-                if (!similarity.keySet().contains(new Pair<>(key1, key2))) {
-                    double contentSim = bookStockHashes.get(key1).minHashedContent.calcSimTo(bookStockHashes.get(key2).minHashedContent);
-                    double titleSim = bookStockHashes.get(key1).minHashedTitle.calcSimTo(bookStockHashes.get(key2).minHashedTitle);
+        if (bookStockHashes.size() < 2000) {
+            TimeThis t = new TimeThis(similarity.keySet().size() > 0 ? "Look Up All Similarities" : "Calc All Similarities", "e");
+            double pace = bookStockHashes.size() / 100;
+            for (var key1 : bookStockHashes.keySet()) {
+                for (var key2 : bookStockHashes.keySet()) {
+                    if (!similarity.keySet().contains(new Pair<>(key1, key2))) {
+                        double contentSim = bookStockHashes.get(key1).minHashedContent.calcSimTo(bookStockHashes.get(key2).minHashedContent);
+                        double titleSim = bookStockHashes.get(key1).minHashedTitle.calcSimTo(bookStockHashes.get(key2).minHashedTitle);
+                        similarity.put(
+                                new Pair<>(key1, key2),
+                                new Pair<>(contentSim, titleSim));
+                        similarity.put(
+                                new Pair<>(key2, key1),
+                                new Pair<>(contentSim, titleSim));
+                    }
+                }
+                if (count++ % pace == 0)
+                    System.out.println((double) count / bookStockHashes.size());
+            }
+            t.end();
+        } else {
+            HashMap<String, String> candidatePair = new HashMap<>();
+            ArrayList<LSHVariant> contentList = new ArrayList<>(bookStockHashes.size());
+            ArrayList<LSHVariant> titleList = new ArrayList<>(bookStockHashes.size());
+            bookStockHashes.keySet().forEach((e) -> {
+                contentList.add(new LSHVariant(bookStockHashes.get(e).minHashedContent, 10, e));
+                titleList.add(new LSHVariant(bookStockHashes.get(e).minHashedTitle, 10, e));
+            });
+            for (LSHVariant lshVariant : contentList) {
+                for (LSHVariant lshVariant1 : contentList) {
+                    if (lshVariant.isCandidate(lshVariant1, 0.8))
+                        candidatePair.put(lshVariant.name, lshVariant1.name);
+                }
+            }
+
+            for (String key : candidatePair.keySet()) {
+                if (!similarity.keySet().contains(new Pair<>(key, candidatePair.get(key)))) {
+                    double contentSim = bookStockHashes.get(key).minHashedContent.calcSimTo(bookStockHashes.get(candidatePair.get(key)).minHashedContent);
+                    double titleSim = bookStockHashes.get(key).minHashedTitle.calcSimTo(bookStockHashes.get(candidatePair.get(key)).minHashedTitle);
                     similarity.put(
-                            new Pair<>(key1, key2),
+                            new Pair<>(key, candidatePair.get(key)),
                             new Pair<>(contentSim, titleSim));
                     similarity.put(
-                            new Pair<>(key2, key1),
+                            new Pair<>(candidatePair.get(key), key),
                             new Pair<>(contentSim, titleSim));
                 }
             }
-            if (count++ % pace == 0)
-                System.out.println((double) count / bookStockHashes.size());
+
         }
-        t.end();
     }
 
     public static HashMap<String, List<SimContainer>> allSimContent(double thr) {
@@ -88,9 +119,11 @@ class Interface {
         for (var key1 : bookStockHashes.keySet()) {
             result.put(bookStockHashes.get(key1).name, new LinkedList<>());
             for (var key2 : bookStockHashes.keySet()) {
-                double sim = similarity.get(new Pair<>(key1, key2)).elem1;
-                if (thr < sim && (!key1.equals(key2))) {
-                    result.get(bookStockHashes.get(key1).name).add(new SimContainer(bookStockHashes.get(key2).name, sim));
+                if (similarity.get(new Pair<>(key1, key2)) != null) {
+                    double sim = similarity.get(new Pair<>(key1, key2)).elem1;
+                    if (thr < sim && (!key1.equals(key2))) {
+                        result.get(bookStockHashes.get(key1).name).add(new SimContainer(bookStockHashes.get(key2).name, sim));
+                    }
                 }
 
             }
@@ -105,9 +138,11 @@ class Interface {
         for (var key1 : bookStockHashes.keySet()) {
             result.put(bookStockHashes.get(key1).name, new LinkedList<>());
             for (var key2 : bookStockHashes.keySet()) {
-                double sim = similarity.get(new Pair<>(key1, key2)).elem2;
-                if (thr < sim && (!key1.equals(key2))) {
-                    result.get(bookStockHashes.get(key1).name).add(new SimContainer(bookStockHashes.get(key2).name, sim));
+                if (similarity.get(new Pair<>(key1, key2)) != null) {
+                    double sim = similarity.get(new Pair<>(key1, key2)).elem2;
+                    if (thr < sim && (!key1.equals(key2))) {
+                        result.get(bookStockHashes.get(key1).name).add(new SimContainer(bookStockHashes.get(key2).name, sim));
+                    }
                 }
 
             }
