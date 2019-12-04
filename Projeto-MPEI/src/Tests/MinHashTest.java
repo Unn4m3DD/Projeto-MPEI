@@ -18,7 +18,7 @@ class MinHashTest {
     public static int optimalK = Integer.MAX_VALUE;
 
     public static void main(String[] args) {
-        optimalNumberOfHashes();
+        optimalNumberOfHashes(accuracy);
         optimalSimilarity();
     }
 
@@ -51,10 +51,10 @@ class MinHashTest {
             System.out.println("Jaccard index and minhash calculations are too far apart");
     }
 
-    static void optimalNumberOfHashes() {
+    static void optimalNumberOfHashes(double thr) {
         System.out.println("Initializing test for optimal number of hashes...");
         File[] files = createFiles(100);
-        for (int seedSize = 50; seedSize <= 250; seedSize += 50) {
+        for (int seedSize = 50; seedSize <= 250; seedSize += 20) {
             double[] similarity = new double[files.length - 1];
             MinHash originalfile = getMinHash(files[0], seedSize);
             for (int i = 0; i < similarity.length; i++) {
@@ -76,8 +76,8 @@ class MinHashTest {
                 sum += Math.abs(similarity[i] - jaccardIndex[i]);
             }
             sum /= similarity.length;
-            if (sum < accuracy) {
-                System.out.println("Test for K = " + seedSize + " passed!");
+            if (sum < thr) {
+                System.out.printf("Number of hash function to maximum avg distance %5.5s = %s\n", thr, seedSize);
                 optimalK = seedSize;
                 break;
             }

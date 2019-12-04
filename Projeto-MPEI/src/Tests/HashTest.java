@@ -16,11 +16,11 @@ public class HashTest {
      and if different hash functions map the same value do distinct number
     */
     public static void main(String[] args) {
-        hashTest();
         dispTest();
+        distTest();
     }
 
-    public static void hashTest() {
+    public static void dispTest() {
         System.out.printf("Iniciando teste das funções de hash ");
         double totalError = 0;
         for (int x = 1; x < testWeight; x++) {
@@ -54,7 +54,7 @@ public class HashTest {
             System.out.println("Passou!");
     }
 
-    public static void dispTest() {
+    public static void distTest() {
         int values = 200;//Integer.MAX_VALUE / 1;
         int numberOfDivisions = (int) Math.pow(2, 16);
         int divisionSize = 2 * (Integer.MAX_VALUE / numberOfDivisions);

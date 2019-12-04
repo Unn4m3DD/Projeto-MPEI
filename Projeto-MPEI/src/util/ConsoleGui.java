@@ -5,7 +5,9 @@ import java.io.*;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
-
+/*
+* modulo retirado do stack overflow
+* */
 public class ConsoleGui extends OutputStream {
     private byte[] oneByte;                                                    // array for write(int val);
     private Appender appender;                                                   // most recent action

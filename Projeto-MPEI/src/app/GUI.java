@@ -22,8 +22,7 @@ import static app.Interface.*;
 import static util.Environment.contentShingleSize;
 
 
-// TODO: 02/12/2019 adicionar tool que chama função de teste
-
+// TODO: 03/12/2019  verificar se as comparações são guardadas
 /* D:\dev\Projeto-MPEI\books\Spanish */
 class GUI extends JFrame implements ActionListener {
     static Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -38,6 +37,7 @@ class GUI extends JFrame implements ActionListener {
             "All Similar Title", "Check book Availability", "Add Book"};
     String[] fileMenuItemKeys = new String[]{"Parse Directory", "Save Library", "Load Library", "Exit"};
     String[] toolsMenuItemKeys = new String[]{"Calculate Jaccard Index", "Download Data Set", "Tests"};
+    static ImageIcon img = new ImageIcon("icon.png");
 
     private void updateButtonClickability() {
         for (var button : buttons.values()) {
@@ -109,47 +109,138 @@ class GUI extends JFrame implements ActionListener {
 
     }
 
-
     private void tests() {
-        JFrame console = new JFrame();
-        JPanel outerPanel = new JPanel(new BorderLayout(10,10));
-        outerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        outerPanel.add(new JLabel("Executing tests"), BorderLayout.NORTH);
-        JTextArea jta = new JTextArea();
-        JScrollPane scrll = new JScrollPane(jta);
-        outerPanel.add(scrll, BorderLayout.CENTER);
-        JPanel downPanel = new JPanel(new GridLayout(1,3));
-        JPanel rerunPanel = new JPanel();
-        JButton rerun = new JButton("Re-run");
-        rerunPanel.add(rerun);
-        downPanel.add(rerunPanel);
-        JPanel pausePanel = new JPanel();
-        JButton pause = new JButton("Pause");
-        pausePanel.add(pause);
-        downPanel.add(pausePanel);
-        JPanel stopPanel = new JPanel();
-        JButton stop = new JButton("Stop");
-        stopPanel.add(stop);
-        downPanel.add(stopPanel);
-        outerPanel.add(downPanel, BorderLayout.SOUTH);
-        console.add(outerPanel);
-        console.setSize(new Dimension(650, 400));
-        int x = (screenSize.width - console.getWidth()) / 2;
-        int y = (screenSize.height - console.getHeight()) / 2;
-        console.setResizable(false);
-        console.setLocation(x, y);
-        console.setVisible(true);
-        Thread tests = (new GlobalTests(jta, 500, new boolean[0]));
-        tests.start();
-        stop.addActionListener((e)-> {
-            tests.interrupt();
+        JFrame frame = new JFrame("Tests");
+        frame.setIconImage(img.getImage());
+        JPanel outerPanel1 = new JPanel(new BorderLayout(10, 10));
+        outerPanel1.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        outerPanel1.add(new JLabel("Select the tests"), BorderLayout.NORTH);
+        JPanel centerPanel = new JPanel(new GridLayout(5, 4));
+        int col = 5;
+        int row = 4;
+        JPanel[][] panelHolder = new JPanel[col][row];
+        setLayout(new GridLayout(col, row));
+        for (int m = 0; m < col; m++) {
+            for (int n = 0; n < row; n++) {
+                panelHolder[m][n] = new JPanel();
+                centerPanel.add(panelHolder[m][n]);
+            }
+        }
+        String[][] testList = new String[][]{
+                {"Bloom Filter", "Optimal N", "Optimal K", "False Negative", "False Positive"},
+                {"Count Filter", "False Positive", "False Negative", "", ""},
+                {"Hash Function", "Dispersal", "Distribution", "", ""},
+                {"MinHash", "General", "<html>Optimal Number of<br>&nbsp;&nbsp;&nbsp;Hash Functions</html>", "", ""}
+        };
+
+        JCheckBox[] testListCheck = new JCheckBox[10]; // hardcoded pq é mais facil
+        int testListCheckCount = 0;
+        for (int i = 0; i < testList.length; i++) {
+            for (int j = 0; j < testList[i].length; j++) {
+                if (j == 0 || testList[i][j].equals(""))
+                    panelHolder[j][i].add(new JLabel(testList[i][j]));
+                else {
+                    testListCheck[testListCheckCount] = new JCheckBox(testList[i][j]);
+                    panelHolder[j][i].add(testListCheck[testListCheckCount++]);
+                }
+            }
+        }
+        outerPanel1.add(centerPanel, BorderLayout.CENTER);
+
+        JPanel southPanel = new JPanel();
+        JPanel paramsPanel = new JPanel(new GridLayout(2, 1));
+        JTextField[] param = new JTextField[2];
+        JPanel param1Panel = new JPanel();
+        param1Panel.add(new JLabel("Calculate Optimal N for "));
+        param[0] = new JTextField("    10");
+        param1Panel.add(param[0]);
+        param1Panel.add(new JLabel("% of false positives"));
+        paramsPanel.add(param1Panel);
+
+
+        JPanel param2Panel = new JPanel();
+        param2Panel.add(new JLabel("Calculate Number of Hash Functions for "));
+        param[1] = new JTextField("     2");
+        param2Panel.add(param[1]);
+        param2Panel.add(new JLabel("% of maximum average distance to Jaccard index"));
+        paramsPanel.add(param2Panel);
+
+
+        southPanel.add(paramsPanel);
+        JPanel startPanel = new JPanel();
+        JButton start = new JButton("Start");
+        startPanel.add(start);
+        southPanel.add(startPanel);
+
+        outerPanel1.add(southPanel, BorderLayout.SOUTH);
+
+
+        frame.add(outerPanel1);
+        frame.setSize(new Dimension(750, 400));
+        int x = (screenSize.width - frame.getWidth()) / 2;
+        int y = (screenSize.height - frame.getHeight()) / 2;
+        frame.setResizable(false);
+        frame.setLocation(x, y);
+        frame.setVisible(true);
+
+        start.addActionListener((e) -> {
+            boolean[] options = new boolean[testListCheck.length];
+            for (int i = 0; i < testListCheck.length; i++) {
+                options[i] = testListCheck[i].isSelected();
+            }
+            JFrame console = new JFrame("Tests");
+            console.setIconImage(img.getImage());
+            JPanel outerPanel = new JPanel(new BorderLayout(10, 10));
+            outerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            outerPanel.add(new JLabel("Executing tests"), BorderLayout.NORTH);
+            JTextArea jta = new JTextArea();
+            JScrollPane scrll = new JScrollPane(jta);
+            outerPanel.add(scrll, BorderLayout.CENTER);
+            JPanel downPanel = new JPanel(new GridLayout(1, 3));
+            JPanel rerunPanel = new JPanel();
+            JButton rerun = new JButton("Re-run");
+            rerunPanel.add(rerun);
+            downPanel.add(rerunPanel);
+            JPanel pausePanel = new JPanel();
+            JButton pause = new JButton("Pause");
+            pausePanel.add(pause);
+            downPanel.add(pausePanel);
+            JPanel stopPanel = new JPanel();
+            JButton stop = new JButton("Stop");
+            stopPanel.add(stop);
+            downPanel.add(stopPanel);
+            outerPanel.add(downPanel, BorderLayout.SOUTH);
+            console.add(outerPanel);
+            console.setSize(new Dimension(650, 400));
+            int x2 = (screenSize.width - console.getWidth()) / 2;
+            int y2 = (screenSize.height - console.getHeight()) / 2;
+            console.setResizable(false);
+            console.setLocation(x2, y2);
+            console.setVisible(true);
+
+            double[] params = new double[2];
+            for (int i = 0; i < 2; i++) {
+                try {
+                    params[i] = Double.parseDouble(param[i].getText()) / 100;
+                } catch (Exception exp) {
+                    JOptionPane.showMessageDialog(this, "An error occurred while parsing the inputed value,\n" +
+                            "Default values will be used instead");
+                    params[i] = i == 0 ? 0.1 : 0.02;
+                }
+            }
+
+            Thread tests = (new GlobalTests(jta, 500, options, params));
+            tests.start();
+            stop.addActionListener((e2) -> {
+                tests.interrupt();
+            });
         });
     }
 
 
+
     private GUI(String windowHeader) {
         super(windowHeader);
-        ImageIcon img = new ImageIcon("icon.png");
         this.setIconImage(img.getImage());
         initializeButtonsAndPanels();
         setLayout(new GridLayout(3, 3));
@@ -175,10 +266,11 @@ class GUI extends JFrame implements ActionListener {
         });
     }
 
-    private static void returnBook() {
-        JFrame p = new JFrame();
+    private void returnBook() {
+        JFrame p = new JFrame("Return Book");
+        p.setIconImage(img.getImage());
         p.setLayout(new BorderLayout());
-
+        p.setIconImage(img.getImage());
         //header
         JLabel text = new JLabel();
         text.setText("Insert book name");
@@ -219,47 +311,19 @@ class GUI extends JFrame implements ActionListener {
         p.setResizable(false);
     }
 
-    private static void returnedBook(String book) {
+    private void returnedBook(String book) {
         String s = "";
         if (Interface.returnBook(book))
             s = "Book returned";
         else
             s = "Book not returned";
-        JFrame window = new JFrame();
-        window.setLayout(new GridLayout(1, 2));
-
-        //title sort of
-        JLabel text = new JLabel(s);
-        text.setFont(new Font("Arial", Font.BOLD, 25));
-        text.setText(s);
-
-        //button
-        var okay = new JButton();
-        okay.setText("OK");
-        okay.addActionListener((e) -> {
-            window.dispose();
-        });
-
-        //CLUSTER OF LEFT
-        var left = new JPanel(new GridLayout(2, 1));
-        var textP = new JPanel(new GridBagLayout());
-        textP.add(text);
-        left.add(textP);
-        var okayP = new JPanel();
-        okayP.add(okay, BorderLayout.CENTER);
-        left.add(okayP);
-        window.add(left);
-        window.setSize(500, 300);
-        int x = (screenSize.width - window.getWidth()) / 2;
-        int y = (screenSize.height - window.getHeight()) / 2;
-        window.setLocation(x, y);
-        window.setVisible(true);
-        window.setResizable(false);
+        JOptionPane.showMessageDialog(this, s);
     }
 
 
     private void checkBookAvailability() {
-        JFrame p = new JFrame();
+        JFrame p = new JFrame("Check Book Availability");
+        p.setIconImage(img.getImage());
         p.setLayout(new BorderLayout());
         //header
         JLabel text = new JLabel();
@@ -291,36 +355,8 @@ class GUI extends JFrame implements ActionListener {
                 s = "Book is available for request";
             else
                 s = "Book is not available for request";
-            JFrame window = new JFrame();
-            window.setLayout(new GridLayout(1, 2));
+            JOptionPane.showMessageDialog(this, s);
 
-            //title sort of
-            JLabel inneText = new JLabel(s);
-            inneText.setFont(new Font("Arial", Font.BOLD, 25));
-            inneText.setText(s);
-
-            //button
-            var okay = new JButton();
-            okay.setText("OK");
-            okay.addActionListener((e2) -> {
-                window.dispose();
-            });
-
-            //CLUSTER OF LEFT
-            var left = new JPanel(new GridLayout(2, 1));
-            var textP = new JPanel(new GridBagLayout());
-            textP.add(inneText);
-            left.add(textP);
-            var okayP = new JPanel();
-            okayP.add(okay, BorderLayout.CENTER);
-            left.add(okayP);
-            window.add(left);
-            window.setSize(500, 300);
-            int x = (screenSize.width - window.getWidth()) / 2;
-            int y = (screenSize.height - window.getHeight()) / 2;
-            window.setLocation(x, y);
-            window.setVisible(true);
-            window.setResizable(false);
         });
         search.setPreferredSize(new Dimension(150, 25));
         searchPanel.add(search);
@@ -336,8 +372,9 @@ class GUI extends JFrame implements ActionListener {
 
     }
 
-    private static void requestBook() {
-        JFrame p = new JFrame();
+    private void requestBook() {
+        JFrame p = new JFrame("Request Book");
+        p.setIconImage(img.getImage());
         p.setLayout(new BorderLayout());
         //header
         JLabel text = new JLabel();
@@ -369,36 +406,8 @@ class GUI extends JFrame implements ActionListener {
                 s = "Book requested";
             else
                 s = "Book not requested";
-            JFrame window = new JFrame();
-            window.setLayout(new GridLayout(1, 2));
+            JOptionPane.showMessageDialog(this, s);
 
-            //title sort of
-            JLabel inneText = new JLabel(s);
-            inneText.setFont(new Font("Arial", Font.BOLD, 25));
-            inneText.setText(s);
-
-            //button
-            var okay = new JButton();
-            okay.setText("OK");
-            okay.addActionListener((e2) -> {
-                window.dispose();
-            });
-
-            //CLUSTER OF LEFT
-            var left = new JPanel(new GridLayout(2, 1));
-            var textP = new JPanel(new GridBagLayout());
-            textP.add(inneText);
-            left.add(textP);
-            var okayP = new JPanel();
-            okayP.add(okay, BorderLayout.CENTER);
-            left.add(okayP);
-            window.add(left);
-            window.setSize(500, 300);
-            int x = (screenSize.width - window.getWidth()) / 2;
-            int y = (screenSize.height - window.getHeight()) / 2;
-            window.setLocation(x, y);
-            window.setVisible(true);
-            window.setResizable(false);
         });
         search.setPreferredSize(new Dimension(150, 25));
         searchPanel.add(search);
@@ -414,11 +423,9 @@ class GUI extends JFrame implements ActionListener {
 
     }
 
-    private static void bookRequested(String book) {
-    }
-
     private static void checkTitle() {
         JFrame checkTitlePopup = new JFrame("Check Title");
+        checkTitlePopup.setIconImage(img.getImage());
         checkTitlePopup.setLayout(new BorderLayout());
         //header
         JLabel text = new JLabel();
@@ -450,6 +457,7 @@ class GUI extends JFrame implements ActionListener {
             else
                 s = "Book not found";
             JFrame window = new JFrame("Check Title");
+            window.setIconImage(img.getImage());
             window.setLayout(new GridLayout(1, 2));
             //title sort of
             JLabel innerText = new JLabel(s);
@@ -490,6 +498,7 @@ class GUI extends JFrame implements ActionListener {
 
     private static void searchTitle() {
         JFrame p = new JFrame("Search Title");
+        p.setIconImage(img.getImage());
         p.setLayout(new BorderLayout());
         //header
         JLabel text = new JLabel();
@@ -533,6 +542,7 @@ class GUI extends JFrame implements ActionListener {
 
     private void compare2Books() {
         JFrame p = new JFrame("Compare 2 Books");
+        p.setIconImage(img.getImage());
         p.setLayout(new BorderLayout());
         //header
         JLabel text = new JLabel();
@@ -585,7 +595,8 @@ class GUI extends JFrame implements ActionListener {
 
     private static void findSimilarTitle(String book) {
         var books = searchBook(book, 0.01);
-        JFrame window = new JFrame();
+        JFrame window = new JFrame("Find Similar Title");
+        window.setIconImage(img.getImage());
         window.setLayout(new BorderLayout(0, 1));
 
         //title sort of
@@ -635,6 +646,7 @@ class GUI extends JFrame implements ActionListener {
     private void allSimilarContent() {
         Mutable<HashMap<String, List<SimContainer>>> toShow = new Mutable<>(allSimContent(.8));
         JFrame window = new JFrame("Similar Content");
+        window.setIconImage(img.getImage());
         window.setLayout(new BorderLayout(0, 1));
 
 
@@ -744,6 +756,7 @@ class GUI extends JFrame implements ActionListener {
     private void allSimilarTitle() {
         Mutable<HashMap<String, List<SimContainer>>> toShow = new Mutable<>(allSimTitle(.8));
         JFrame window = new JFrame("Similar Content");
+        window.setIconImage(img.getImage());
         window.setLayout(new BorderLayout(0, 1));
 
 
@@ -887,6 +900,8 @@ class GUI extends JFrame implements ActionListener {
             pr.setPreferredSize(new Dimension(300, 25));
             p.add(pr);
             JFrame window = new JFrame("Parsing Directory");
+            window.setIconImage(img.getImage());
+            window.setIconImage(img.getImage());
             window.setSize(400, 100);
             window.add(p);
             window.setLocationRelativeTo(this);
@@ -922,6 +937,7 @@ class GUI extends JFrame implements ActionListener {
 
     private void downloadDataSetPopup() {
         JFrame qttFrame = new JFrame("Download Dataset");
+        qttFrame.setIconImage(img.getImage());
         JPanel outerPanel = new JPanel(new GridLayout(2, 1));
         qttFrame.setSize(new Dimension(600, 125));
         JPanel p1 = new JPanel();
@@ -963,6 +979,7 @@ class GUI extends JFrame implements ActionListener {
                 pr.setPreferredSize(new Dimension(300, 25));
                 p.add(pr);
                 JFrame window = new JFrame("Downloading Dataset");
+                window.setIconImage(img.getImage());
                 window.setSize(400, 100);
                 window.add(p);
                 window.setLocationRelativeTo(this);

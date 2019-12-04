@@ -15,21 +15,21 @@ class BloomFilterTest {
 
     public static void main(String[] args) {
         optimalKFullTest();
-        n = optimalNtest();
+        n = optimalNtest(accuracy);
         BloomFilter b = BloomFilter.fromFile("mises.txt", n);
         falseNegativeTest(b);
         falsePositiveFullTest(b);
     }
 
-    static int optimalNtest() {
+    static int optimalNtest(double thr) {
         int inputDataSize = 1000;
         System.out.println("Teste de N optimo em execução: ");
         for (int i = 1; true; i++) {
             try {
                 BloomFilter dataSetFilter = createRandomFilter(i * inputDataSize, BloomFilter.optimalK(i * inputDataSize, inputDataSize), inputDataSize);
                 double result = falsePositiveTest(dataSetFilter);
-                if (Math.abs(result) < .02) {
-                    System.out.println("N minimo para erro < 0.1 : " + i);
+                if (Math.abs(result) < thr) {
+                    System.out.printf("N minimo para erro < %5.5s%s : %s\n", thr * 100,"%", i);
                     return i;
                 }
             } catch (Exception e) {

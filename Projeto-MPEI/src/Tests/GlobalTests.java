@@ -15,25 +15,28 @@ public class GlobalTests extends Thread {
     JTextArea jta;
     int numberOfLines;
     boolean[] testsToPerform;
-
-    public GlobalTests(JTextArea jta, int numberOfLines, boolean[] testsToPerform) {
+    double[] params;
+    public GlobalTests(JTextArea jta, int numberOfLines, boolean[] testsToPerform, double[] params) {
         this.jta = jta;
         this.numberOfLines = numberOfLines;
         this.testsToPerform = testsToPerform;
+        this.params = params;
     }
 
     @Override
     public void run() {
         PrintStream con = new PrintStream(new ConsoleGui(jta, numberOfLines));
+        System.setOut(con);
+        System.setErr(con);
         if (testsToPerform.length != 10)
             System.out.print("An error occurred and all tests will be perfomed");
 
-        BloomFilter b = BloomFilter.fromFile("mises.txt", n);
+        BloomFilter b = BloomFilter.fromFile("mises.txt", 10);
 
         if (testsToPerform[0])
             optimalKFullTest();
         else if (testsToPerform[1])
-            n = optimalNtest();
+            n = optimalNtest(params[0]);
         else if (testsToPerform[2])
             falseNegativeTest(b);
         else if (testsToPerform[3])
@@ -43,20 +46,13 @@ public class GlobalTests extends Thread {
         else if (testsToPerform[5])
             testFalseNeg();
         else if (testsToPerform[6])
-            hashTest();
-        else if (testsToPerform[7])
             dispTest();
+        else if (testsToPerform[7])
+            distTest();
         else if (testsToPerform[8])
-            optimalNumberOfHashes();
-        else if (testsToPerform[9])
             optimalSimilarity();
+        else if (testsToPerform[9])
+            optimalNumberOfHashes(params[1]);
 
-
-        System.setOut(con);
-        System.setErr(con);
-        HashTest.main(new String[0]);
-        BloomFilterTest.main(new String[0]);
-        CountFilterTest.main(new String[0]);
-        MinHashTest.main(new String[0]);
     }
 }

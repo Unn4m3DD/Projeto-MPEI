@@ -33,25 +33,39 @@ class Interface {
         Book b = new Book(f);
         var toAdd = new ProcessedBooksResult();
         toAdd.minHashedContent = new MinHash(MinHash.shinglesHashCodeFromCharArr(b.getContent(), contentShingleSize));
-        toAdd.minHashedContent = new MinHash(MinHash.shinglesHashCodeFromCharArr(b.getTitle(), titleShingleSize));
+        toAdd.minHashedTitle = new MinHash(MinHash.shinglesHashCodeFromCharArr(b.getTitle(), titleShingleSize));
         StringBuilder sb = new StringBuilder();
-        for(var c: b.getTitle())
+        for (var c : b.getTitle())
             sb.append(c);
         toAdd.name = sb.toString();
         if (availableBooks.isElement(toAdd.name)) return false;
         availableBooks.addElement(toAdd.name);
         bookStockHashes.put(f.getName(), toAdd);
+        if (similarity.size() > 0) {
+            for (var key1 : bookStockHashes.keySet()) {
+                if (!similarity.keySet().contains(new Pair<>(key1, f.getName()))) {
+                    double contentSim = bookStockHashes.get(key1).minHashedContent.calcSimTo(bookStockHashes.get(f.getName()).minHashedContent);
+                    double titleSim = bookStockHashes.get(key1).minHashedTitle.calcSimTo(bookStockHashes.get(f.getName()).minHashedTitle);
+                    similarity.put(
+                            new Pair<>(key1, f.getName()),
+                            new Pair<>(contentSim, titleSim));
+                    similarity.put(
+                            new Pair<>(f.getName(), key1),
+                            new Pair<>(contentSim, titleSim));
+                }
+            }
+        }
         return true;
     }
 
     private static void allSim() {
         TimeThis t = new TimeThis(similarity.keySet().size() > 0 ? "Look Up All Similarities" : "Calc All Similarities", "e");
+        int count = 0;
+        double pace = bookStockHashes.size() / 100;
         for (var key1 : bookStockHashes.keySet()) {
             for (var key2 : bookStockHashes.keySet()) {
                 if (!similarity.keySet().contains(new Pair<>(key1, key2))) {
-                    TimeThis t1 = new TimeThis("sena", "e");
                     double contentSim = bookStockHashes.get(key1).minHashedContent.calcSimTo(bookStockHashes.get(key2).minHashedContent);
-                    t1.end();
                     double titleSim = bookStockHashes.get(key1).minHashedTitle.calcSimTo(bookStockHashes.get(key2).minHashedTitle);
                     similarity.put(
                             new Pair<>(key1, key2),
@@ -61,6 +75,8 @@ class Interface {
                             new Pair<>(contentSim, titleSim));
                 }
             }
+            if (count++ % pace == 0)
+                System.out.println((double) count / bookStockHashes.size());
         }
         t.end();
     }
@@ -111,7 +127,6 @@ class Interface {
                         MinHash.shinglesHashCodeFromCharArr(list, titleShingleSize)
                 );
         for (var item : bookStockHashes.values()) {
-
             if (item.minHashedTitle.calcSimTo(nameMinHash) >= thr) {
                 result.add(item);
             }
@@ -164,7 +179,7 @@ class Interface {
     public static void save(File destination) throws IOException {
         FileOutputStream file = new FileOutputStream(destination);
         ObjectOutputStream out = new ObjectOutputStream(file);
-        out.writeObject(new AppState(bookStockHashes, availableBooks, requestedBooks));
+        out.writeObject(new AppState(bookStockHashes, availableBooks, requestedBooks, similarity));
         out.close();
         file.close();
     }
@@ -176,6 +191,7 @@ class Interface {
         bookStockHashes = tmp.getBookStockHashes();
         availableBooks = tmp.getAvailableBooks();
         requestedBooks = tmp.getRequestedBooks();
+        similarity = tmp.getSimilarity();
         in.close();
         file.close();
     }
