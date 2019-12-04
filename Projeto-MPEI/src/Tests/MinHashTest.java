@@ -46,7 +46,7 @@ class MinHashTest {
         System.out.println();
         sum /= similarity.length;
         if (sum < accuracy)
-            System.out.println("Test for difference between Jaccard index and minhash similarity passed!");
+            System.out.println("Difference between Jaccard index and minhash similarity test passed!");
         else
             System.out.println("Jaccard index and minhash calculations are too far apart");
     }

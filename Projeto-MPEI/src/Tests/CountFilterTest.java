@@ -17,7 +17,7 @@ public class CountFilterTest {
     }
 
     static void testFalseNeg() {
-        System.out.println("Test for false negatives in execution ");
+        System.out.println("False negative test in execution ");
         int n = dataSetSize * 10;
         int k = BloomFilter.optimalK(n, dataSetSize);
         ArrayList<String> elements = new ArrayList<>(dataSetSize);
@@ -51,7 +51,7 @@ public class CountFilterTest {
         if ((double) count / elements.size() < 0.1)
             System.out.println("Passed !");
         else
-            System.out.println("Didn't pass false negatives test");
+            System.out.println("Didn't pass false negative test");
     }
 
     static void testFalsePos() {

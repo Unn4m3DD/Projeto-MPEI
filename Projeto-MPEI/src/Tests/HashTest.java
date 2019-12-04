@@ -21,7 +21,7 @@ public class HashTest {
     }
 
     public static void dispTest() {
-        System.out.printf("Iniciando teste das funções de hash ");
+        System.out.printf("Hash function test in execution ");
         double totalError = 0;
         for (int x = 1; x < testWeight; x++) {
             Random r = new Random();
@@ -49,9 +49,9 @@ public class HashTest {
         System.out.println();
         totalError /= testWeight;
         if (totalError > accuracy)
-            System.out.println("Erro no teste da função de hash");
+            System.out.println("Error in hash function test");
         if (totalError < accuracy)
-            System.out.println("Passou!");
+            System.out.println("Passed !");
     }
 
     public static void distTest() {
@@ -61,7 +61,7 @@ public class HashTest {
         var divisions = new int[numberOfDivisions];
         Random generator = new Random();
         for (int j = 0; j < 10; j++) {
-            System.out.println("A iniciar o teste de dispersão da hash numero "+(j+1));
+            System.out.println("Initializing dispersion test for hash number "+(j+1));
             int hashNumber = (int) 3;//(Math.random() * numberOfHashesForMinHash);
             for (int i = 0; i < values; i++) {
                 int hash = (hash(generator.nextInt(), hashNumber));
@@ -87,12 +87,12 @@ public class HashTest {
             }
             int stdDev = (int) Math.sqrt((double) variance);
             double dist = (double) stdDev / values;
-            System.out.println("Distribução: " + dist);
+            System.out.println("Distribution: " + dist);
             double threshold = 3;
             if (dist < threshold)
-                System.out.println("Teste passado!");
+                System.out.println("Passed !");
             else
-                System.out.println("Hash mal distribuida");
+                System.out.println("Poorly distributed hash");
         }
     }
 }
