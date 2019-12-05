@@ -933,7 +933,7 @@ class GUI extends JFrame implements ActionListener {
                             pr.setValue((int) (p * 100));
                             window.repaint();
                             pr.setString((int) (p * 100) + "%");
-                            Thread.sleep(100);
+                            Thread.sleep(1000);
                         } catch (InterruptedException ex) {
                             ex.printStackTrace();
                         }

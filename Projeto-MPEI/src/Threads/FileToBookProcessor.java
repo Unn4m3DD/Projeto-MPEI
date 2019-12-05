@@ -42,7 +42,7 @@ public class FileToBookProcessor extends Thread {
                 int pace = (files.length / 100);
                 for (int i = 0; i < files.length; i++) {
                     if (files[i].isFile()) {
-                        if (toProcessContent.size() > 20)
+                        if (toProcessContent.size() > 40)
                             try {
                                 sleep(1000);
                             } catch (InterruptedException ie) {

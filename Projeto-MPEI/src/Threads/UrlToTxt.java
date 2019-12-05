@@ -2,6 +2,7 @@ package Threads;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.Charset;
 
 public class UrlToTxt extends Thread {
     private String targetURL;
@@ -40,7 +41,7 @@ public class UrlToTxt extends Thread {
                 BufferedReader rd = new BufferedReader(new InputStreamReader(is));
 
                 String line;
-                FileWriter fw = new FileWriter(f);
+                FileWriter fw = new FileWriter(f, Charset.forName("UTF-8"));
                 while ((line = rd.readLine()) != null) {
                     fw.write(line);
                     fw.write("\n");

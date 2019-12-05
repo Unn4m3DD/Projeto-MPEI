@@ -3,6 +3,7 @@ package util;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.MalformedInputException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -55,10 +56,18 @@ public class Book {
                     break;
                 }
             }
-            Files.readAllLines(Paths.get(f.getAbsolutePath()), Charset.forName("UTF-8")).stream().
-                    map(String::toCharArray).forEach(e -> {
-                for (var elem : e) content.add(elem);
-            });
+            try {
+                Files.readAllLines(Paths.get(f.getAbsolutePath()), Charset.forName("UTF-8")).stream().
+                        map(String::toCharArray).forEach(e -> {
+                    for (var elem : e) content.add(elem);
+                });
+            }catch(MalformedInputException mie){
+                Files.readAllLines(Paths.get(f.getAbsolutePath())).stream().
+                        map(String::toCharArray).forEach(e -> {
+                    for (var elem : e) content.add(elem);
+                });
+            }
+
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }

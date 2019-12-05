@@ -57,7 +57,7 @@ public class BookTitleProcessor extends Thread {
                 b = toProcessTitle.poll();
             }
             try {
-                sleep(200);
+                sleep(500);
             } catch (InterruptedException ie) {
                 ie.printStackTrace();
             }
