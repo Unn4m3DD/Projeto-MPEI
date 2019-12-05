@@ -13,6 +13,8 @@ import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -20,7 +22,6 @@ import java.util.List;
 
 import static app.Interface.*;
 import static util.Environment.contentShingleSize;
-
 
 
 /* D:\dev\Projeto-MPEI\books\Spanish */
@@ -32,9 +33,10 @@ class GUI extends JFrame implements ActionListener {
     HashMap<String, JPanel> panels = new HashMap<>();
     HashMap<String, JMenuItem> menuItems = new HashMap<>();
     String[] buttonsKeys = new String[]{
-            "Compare 2 Books", "All Similar Content", //"Parse Directory",
-            "Search Title", "Check Title", "Request Book", "Return Book",
-            "All Similar Title", "Check book Availability", "Add Book"};
+            "Check Title", "All Similar Title", "Check book Availability",
+            "Search Title", "All Similar Content", "Request Book",
+            "Add Book", "Compare 2 Books", "Return Book",
+    };
     String[] fileMenuItemKeys = new String[]{"Parse Directory", "Save Library", "Load Library", "Exit"};
     String[] toolsMenuItemKeys = new String[]{"Calculate Jaccard Index", "Download Data Set", "Tests"};
     static ImageIcon img = new ImageIcon("icon.png");
@@ -152,7 +154,7 @@ class GUI extends JFrame implements ActionListener {
         JTextField[] param = new JTextField[2];
         JPanel param1Panel = new JPanel();
         param1Panel.add(new JLabel("Calculate Optimal N for "));
-        param[0] = new JTextField("    10");
+        param[0] = new JTextField("    2");
         param1Panel.add(param[0]);
         param1Panel.add(new JLabel("% of false positives"));
         paramsPanel.add(param1Panel);
@@ -160,7 +162,7 @@ class GUI extends JFrame implements ActionListener {
 
         JPanel param2Panel = new JPanel();
         param2Panel.add(new JLabel("Calculate Number of Hash Functions for "));
-        param[1] = new JTextField("     2");
+        param[1] = new JTextField("     3");
         param2Panel.add(param[1]);
         param2Panel.add(new JLabel("% of maximum average distance to Jaccard index"));
         paramsPanel.add(param2Panel);
@@ -189,6 +191,7 @@ class GUI extends JFrame implements ActionListener {
                 options[i] = testListCheck[i].isSelected();
             }
             JFrame console = new JFrame("Tests");
+
             console.setIconImage(img.getImage());
             JPanel outerPanel = new JPanel(new BorderLayout(10, 10));
             outerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -197,14 +200,7 @@ class GUI extends JFrame implements ActionListener {
             JScrollPane scrll = new JScrollPane(jta);
             outerPanel.add(scrll, BorderLayout.CENTER);
             JPanel downPanel = new JPanel(new GridLayout(1, 3));
-            JPanel rerunPanel = new JPanel();
-            JButton rerun = new JButton("Re-run");
-            rerunPanel.add(rerun);
-            downPanel.add(rerunPanel);
-            JPanel pausePanel = new JPanel();
-            JButton pause = new JButton("Pause");
-            pausePanel.add(pause);
-            downPanel.add(pausePanel);
+
             JPanel stopPanel = new JPanel();
             JButton stop = new JButton("Stop");
             stopPanel.add(stop);
@@ -229,10 +225,15 @@ class GUI extends JFrame implements ActionListener {
                 }
             }
 
-            Thread tests = (new GlobalTests(jta, 500, options, params));
+            Thread tests = (new GlobalTests(jta, 2500, options, params));
             tests.start();
             stop.addActionListener((e2) -> {
-                tests.interrupt();
+                tests.stop();
+            });
+            console.addWindowListener(new WindowAdapter() {
+                public void windowClosing(WindowEvent e) {
+                    tests.stop();
+                }
             });
         });
     }

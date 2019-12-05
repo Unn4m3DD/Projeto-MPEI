@@ -1,9 +1,5 @@
 package util;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,27 +38,16 @@ public class TimeThis {
     }
 
     public static void printAllDelays() {
-        try {
-            FileWriter p = new FileWriter(new File("TimingLogs.txt"), true);
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss");
-            Date date = new Date(System.currentTimeMillis());
-            p.write("\n" + formatter.format(date) + "\n");
-            for (String key : allTimes.keySet()) {
-                int avg = 0;
-                for (var single : allTimes.get(key))
-                    avg += single;
-                if (allTimes.get(key).size() != 0)
-                    avg /= allTimes.get(key).size();
-                else {
-                    System.out.println();
-                    p.write("\n");
-                }
-                System.out.printf("%10.10s ms    %s\n", (avg), key);
-                p.write(String.format("%10.10s ms    %s\n", (avg), key));
+        for (String key : allTimes.keySet()) {
+            int avg = 0;
+            for (var single : allTimes.get(key))
+                avg += single;
+            if (allTimes.get(key).size() != 0)
+                avg /= allTimes.get(key).size();
+            else {
+                System.out.println();
             }
-            p.write("\n");
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
+            System.out.printf("%10.10s ms    %s\n", (avg), key);
         }
     }
 }

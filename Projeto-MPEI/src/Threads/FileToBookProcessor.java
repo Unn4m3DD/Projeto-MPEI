@@ -6,6 +6,7 @@ import util.Mutable;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
@@ -48,7 +49,8 @@ public class FileToBookProcessor extends Thread {
                                 ie.printStackTrace();
                             }
                         Book b = new Book(files[i]);
-                        toProcessTitle.add(b);
+                        if (!b.getTitle().equals(new ArrayList<>()))
+                            toProcessTitle.add(b);
                     }
                     if ((pace != 0) && (i % (pace) == 0))
                         progress.set((double) i / files.length);

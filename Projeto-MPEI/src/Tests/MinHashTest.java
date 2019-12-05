@@ -4,10 +4,14 @@ import modules.Hash;
 import modules.HashSeed;
 import modules.MinHash;
 import util.Book;
+import util.Environment;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -19,10 +23,10 @@ class MinHashTest {
 
     public static void main(String[] args) {
         optimalNumberOfHashes(accuracy);
-        optimalSimilarity();
+        minHashTest();
     }
 
-    static void optimalSimilarity() {
+    static void minHashTest() {
         System.out.println("Initializing test for minhash quality");
         File[] files = createFiles(fileSize);
         double[] similarity = new double[files.length - 1];
@@ -54,7 +58,7 @@ class MinHashTest {
     static void optimalNumberOfHashes(double thr) {
         System.out.println("Initializing test for optimal number of hashes...");
         File[] files = createFiles(fileSize);
-        for (int seedSize = 50; seedSize <= 250; seedSize += 20) {
+        for (int seedSize = 300; seedSize <= 400; seedSize += 30) {
             double[] similarity = new double[files.length - 1];
             MinHash originalfile = getMinHash(files[0], seedSize);
             for (int i = 0; i < similarity.length; i++) {
@@ -80,9 +84,10 @@ class MinHashTest {
                 System.out.printf("Number of hash function to maximum avg distance %5.5s = %s\n", thr, seedSize);
                 optimalK = seedSize;
                 deleteFiles(files);
-                break;
+                return;
             }
         }
+        System.out.printf("For 50 < Number Of Hash Function < 250, there is no value that matches the threshold %5.5s\n", thr);
     }
 
     private static void deleteFiles(File [] files) {
@@ -94,7 +99,10 @@ class MinHashTest {
     static MinHash getMinHash(File file, int seedSize) {
         var shingles = MinHash.shinglesHashCodeFromCharArr((new Book(file)).getContent(), shingleSize);
         Hash.hashSeed = new HashSeed(seedSize);
-        return new MinHash(shingles);
+        MinHash result = new MinHash(shingles);
+        Hash.hashSeed = new HashSeed(Environment.numberOfHashesForMinHash);
+        return result;
+
     }
 
     static File[] createFiles(int numFiles) {
@@ -107,15 +115,14 @@ class MinHashTest {
             while (fileReader.hasNext()) {
                 sentence += fileReader.next();
             }
-            fileSize = sentence.length();
             fileReader.close();
             double base = Math.log(numFiles);
 
             for (int i = 1; i <= numFiles; i++) {
                // fileArr[i] = new File("Projeto-MPEI" + File.separator + "src" + File.separator + "Tests" + File.separator + "test" + File.separator + "test" + i * 10 + ".txt");
-                fileArr[i] = new File("test" + File.separator + "test" + i * 10 + ".txt");
-                PrintWriter writeFiles = new PrintWriter(fileArr[i]);
-                for (int x = 0; x < fileSize; x++) {
+                fileArr[i] = new File("test" + File.separator + "test" + i + ".txt");
+                PrintWriter writeFiles = new PrintWriter(fileArr[i], Charset.forName("UTF-8"));
+                for (int x = 0; x < sentence.length(); x++) {
                     writeFiles.print(Math.random() < Math.log(i) / base / 3 + 0.66 ? sentence.charAt(x) : randomChar());
 
                 }
@@ -123,6 +130,8 @@ class MinHashTest {
             }
         } catch (FileNotFoundException fnfe) {
             fnfe.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
         }
         return fileArr;
     }

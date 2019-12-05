@@ -2,8 +2,10 @@ package util;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -53,8 +55,7 @@ public class Book {
                     break;
                 }
             }
-            Arrays.stream(new int[2]);
-            Files.readAllLines(Path.of(f.getAbsolutePath())).stream().
+            Files.readAllLines(Paths.get(f.getAbsolutePath()), Charset.forName("UTF-8")).stream().
                     map(String::toCharArray).forEach(e -> {
                 for (var elem : e) content.add(elem);
             });

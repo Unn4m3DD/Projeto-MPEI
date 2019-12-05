@@ -50,7 +50,7 @@ public class GlobalTests extends Thread {
         if (testsToPerform[7])
             distTest();
         if (testsToPerform[8])
-            optimalSimilarity();
+            minHashTest();
         if (testsToPerform[9])
             optimalNumberOfHashes(params[1]);
 
