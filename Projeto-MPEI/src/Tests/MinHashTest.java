@@ -58,7 +58,7 @@ class MinHashTest {
     static void optimalNumberOfHashes(double thr) {
         System.out.println("Initializing test for optimal number of hashes...");
         File[] files = createFiles(fileSize);
-        for (int seedSize = 300; seedSize <= 400; seedSize += 30) {
+        for (int seedSize = 100; seedSize <= 250; seedSize += 50) {
             double[] similarity = new double[files.length - 1];
             MinHash originalfile = getMinHash(files[0], seedSize);
             for (int i = 0; i < similarity.length; i++) {
@@ -87,7 +87,7 @@ class MinHashTest {
                 return;
             }
         }
-        System.out.printf("For 50 < Number Of Hash Function < 250, there is no value that matches the threshold %5.5s\n", thr);
+        System.out.printf("For 100 < Number Of Hash Function < 250, there is no value that matches the threshold %5.5s\n", thr);
     }
 
     private static void deleteFiles(File [] files) {
