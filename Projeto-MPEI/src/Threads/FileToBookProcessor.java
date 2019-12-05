@@ -5,7 +5,6 @@ import util.Book;
 import util.Mutable;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -39,8 +38,10 @@ public class FileToBookProcessor extends Thread {
             try {
                 File[] files = dir.listFiles((dir, name) -> name.toLowerCase().endsWith(".txt"));
                 availableBooks.setParams(files.length * 8, BloomFilter.optimalK(files.length * 8, files.length));
-                int pace = (files.length / 100);
+                int pace = (int) Math.ceil((double)files.length / 100);
                 for (int i = 0; i < files.length; i++) {
+                    if ((pace != 0) && (i % (pace) == 0))
+                        progress.set((double) i / files.length);
                     if (files[i].isFile()) {
                         if (toProcessContent.size() > 40)
                             try {
@@ -51,9 +52,9 @@ public class FileToBookProcessor extends Thread {
                         Book b = new Book(files[i]);
                         if (!b.getTitle().equals(new ArrayList<>()))
                             toProcessTitle.add(b);
+
                     }
-                    if ((pace != 0) && (i % (pace) == 0))
-                        progress.set((double) i / files.length);
+
                 }
             } catch (NullPointerException e) {
                 System.out.println(dir.getName() + " está vazio.");
