@@ -24,7 +24,8 @@ public class BookDirectoryProcessor extends Thread {
     public HashMap<String, ProcessedBooksResult> result = new HashMap<>();
     private File dir;
     private Mutable<Double> progress;
-    private BloomFilter availableBooks ;
+    private BloomFilter availableBooks;
+
     public BookDirectoryProcessor(File dir, Mutable<Double> progress, BloomFilter availableBooks) {
         this.dir = dir;
         this.progress = progress;
@@ -34,19 +35,20 @@ public class BookDirectoryProcessor extends Thread {
     public void run() {
         TimeThis.currentlyTiming = true;
         TimeThis t1 = new TimeThis("Processamento para MinHash e BloomFilter", "e");
-        Thread[] threads = new Thread[6];
+        Thread[] threads = new Thread[Runtime.getRuntime().availableProcessors() > 4 ? 6 : 3];
         threads[0] = new FileToBookProcessor(toProcessTitle, toProcessContent, dir, finished, progress, availableBooks);
-        try{
+        try {
             Thread.sleep(50);
-        }catch (InterruptedException ie){
+        } catch (InterruptedException ie) {
             ie.printStackTrace();
         }
         threads[1] = new BookTitleProcessor(toProcessTitle, toProcessContent, finished, result, availableBooks);
         threads[2] = new BookContentProcessor(toProcessContent, finished, result);
-        threads[3] = new BookContentProcessor(toProcessContent, finished, result);
-        threads[4] = new BookContentProcessor(toProcessContent, finished, result);
-        threads[5] = new BookContentProcessor(toProcessContent, finished, result);
-//        threads[6] = new BookContentProcessor(toProcessContent, finished, result, hashSeed);
+        if (Runtime.getRuntime().availableProcessors() > 4) {
+            threads[3] = new BookContentProcessor(toProcessContent, finished, result);
+            threads[4] = new BookContentProcessor(toProcessContent, finished, result);
+            threads[5] = new BookContentProcessor(toProcessContent, finished, result);
+        }
         for (Thread thread : threads) thread.start();
 
         while (threads[3].isAlive()) {

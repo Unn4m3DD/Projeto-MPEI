@@ -257,6 +257,7 @@ class GUI extends JFrame implements ActionListener {
 
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
+        System.out.println(Runtime.getRuntime().availableProcessors());
         (new GUI("Library Manager")).setVisible(true);
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
