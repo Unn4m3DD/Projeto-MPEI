@@ -22,7 +22,6 @@ public class CountFilterTest {
         int k = BloomFilter.optimalK(n, dataSetSize);
         ArrayList<String> elements = new ArrayList<>(dataSetSize);
         CountFilter data = new CountFilter(n, k);
-        // TODO: 02/12/2019 checkar se optimalK de countfilter é igual ao optimal K de bloom filter
         for (int i = 0; i < dataSetSize; i++) {
             String newElem = randomString();
             int timesAdd = (int) (Math.random() * 100);

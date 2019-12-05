@@ -61,7 +61,6 @@ public class HashTest {
         var divisions = new int[numberOfDivisions];
         Random generator = new Random();
         for (int j = 0; j < 2; j++) {
-            // TODO: 04/12/2019 alterar os prints
             //System.out.println("Initializing dispersion test for hash number "+(j+1));
             int hashNumber = (int) (Math.random() * numberOfHashesForMinHash);
             for (int i = 0; i < values; i++) {
@@ -72,8 +71,9 @@ public class HashTest {
                         break;
                     }
                 }
-                if ((i) % (values / 10) == 0)
-                    System.out.printf((double) i / values + ", ");
+                if (i % (values / 10) == 0) {
+                    System.out.printf("%3.3s, ", ((double) i / values));
+                }
             }
 
             double avg = 0;

@@ -89,7 +89,6 @@ class MinHashTest {
         for (int i = 1; i <files.length; i++) {
             files[i].delete();
         }
-        // TODO: 04/12/2019 implementar o método que elimine os ficheiros 
     }
 
     static MinHash getMinHash(File file, int seedSize) {
